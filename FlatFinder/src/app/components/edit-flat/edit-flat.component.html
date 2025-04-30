@@ -1,0 +1,158 @@
+<app-header></app-header>
+<div class="container">
+  <h1>Edit Flat</h1>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <form [formGroup]="flatForm" (ngSubmit)="onSubmit()" class="edit-form">
+    <div class="form-group">
+      <label for="city">City</label>
+      <input
+        type="text"
+        id="city"
+        formControlName="city"
+        class="form-control"
+      />
+      <div
+        *ngIf="flatForm.get('city')?.invalid && flatForm.get('city')?.touched"
+        class="error-message"
+      >
+        City is required and must be at least 2 characters long
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="streetName">Street Name</label>
+      <input
+        type="text"
+        id="streetName"
+        formControlName="streetName"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('streetName')?.invalid &&
+          flatForm.get('streetName')?.touched
+        "
+        class="error-message"
+      >
+        Street name is required and must be at least 2 characters long
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="streetNumber">Street Number</label>
+      <input
+        type="number"
+        id="streetNumber"
+        formControlName="streetNumber"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('streetNumber')?.invalid &&
+          flatForm.get('streetNumber')?.touched
+        "
+        class="error-message"
+      >
+        Street number is required and must be greater than 0
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="areaSize">Area Size (m²)</label>
+      <input
+        type="number"
+        id="areaSize"
+        formControlName="areaSize"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('areaSize')?.invalid && flatForm.get('areaSize')?.touched
+        "
+        class="error-message"
+      >
+        Area size is required and must be greater than 0
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="yearBuilt">Year Built</label>
+      <input
+        type="number"
+        id="yearBuilt"
+        formControlName="yearBuilt"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('yearBuilt')?.invalid &&
+          flatForm.get('yearBuilt')?.touched
+        "
+        class="error-message"
+      >
+        Year built must be between 1800 and current year
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="rentPrice">Rent Price ($/month)</label>
+      <input
+        type="number"
+        id="rentPrice"
+        formControlName="rentPrice"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('rentPrice')?.invalid &&
+          flatForm.get('rentPrice')?.touched
+        "
+        class="error-message"
+      >
+        Rent price is required and must be greater than 0
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dateAvailable">Available From</label>
+      <input
+        type="date"
+        id="dateAvailable"
+        formControlName="dateAvailable"
+        class="form-control"
+      />
+      <div
+        *ngIf="
+          flatForm.get('dateAvailable')?.invalid &&
+          flatForm.get('dateAvailable')?.touched
+        "
+        class="error-message"
+      >
+        Available date is required
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <input
+        type="checkbox"
+        id="hasAC"
+        formControlName="hasAC"
+        class="checkbox"
+      />
+      <label for="hasAC">Has Air Conditioning</label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" routerLink="/myflats">
+        Cancel
+      </button>
+      <button type="submit" class="save-btn" [disabled]="flatForm.invalid">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>

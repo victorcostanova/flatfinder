@@ -1,1 +1,179 @@
-<p>new-flat works!</p>
+<app-header></app-header>
+<div class="container">
+  <div class="form-card">
+    <h1>Add New Flat</h1>
+
+    <form [formGroup]="flatForm" (ngSubmit)="onSubmit()" class="flat-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">City</label>
+          <input
+            id="city"
+            type="text"
+            formControlName="city"
+            [class.invalid]="
+              flatForm.get('city')?.invalid && flatForm.get('city')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('city')?.invalid && flatForm.get('city')?.touched
+            "
+          >
+            {{ getErrorMessage("city") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="streetName">Street Name</label>
+          <input
+            id="streetName"
+            type="text"
+            formControlName="streetName"
+            [class.invalid]="
+              flatForm.get('streetName')?.invalid &&
+              flatForm.get('streetName')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('streetName')?.invalid &&
+              flatForm.get('streetName')?.touched
+            "
+          >
+            {{ getErrorMessage("streetName") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="streetNumber">Street Number</label>
+          <input
+            id="streetNumber"
+            type="number"
+            formControlName="streetNumber"
+            [class.invalid]="
+              flatForm.get('streetNumber')?.invalid &&
+              flatForm.get('streetNumber')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('streetNumber')?.invalid &&
+              flatForm.get('streetNumber')?.touched
+            "
+          >
+            {{ getErrorMessage("streetNumber") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="areaSize">Area Size (m²)</label>
+          <input
+            id="areaSize"
+            type="number"
+            formControlName="areaSize"
+            [class.invalid]="
+              flatForm.get('areaSize')?.invalid &&
+              flatForm.get('areaSize')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('areaSize')?.invalid &&
+              flatForm.get('areaSize')?.touched
+            "
+          >
+            {{ getErrorMessage("areaSize") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="yearBuilt">Year Built</label>
+          <input
+            id="yearBuilt"
+            type="number"
+            formControlName="yearBuilt"
+            [class.invalid]="
+              flatForm.get('yearBuilt')?.invalid &&
+              flatForm.get('yearBuilt')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('yearBuilt')?.invalid &&
+              flatForm.get('yearBuilt')?.touched
+            "
+          >
+            {{ getErrorMessage("yearBuilt") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rentPrice">Rent Price</label>
+          <input
+            id="rentPrice"
+            type="number"
+            formControlName="rentPrice"
+            [class.invalid]="
+              flatForm.get('rentPrice')?.invalid &&
+              flatForm.get('rentPrice')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('rentPrice')?.invalid &&
+              flatForm.get('rentPrice')?.touched
+            "
+          >
+            {{ getErrorMessage("rentPrice") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateAvailable">Date Available</label>
+          <input
+            id="dateAvailable"
+            type="date"
+            formControlName="dateAvailable"
+            [class.invalid]="
+              flatForm.get('dateAvailable')?.invalid &&
+              flatForm.get('dateAvailable')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              flatForm.get('dateAvailable')?.invalid &&
+              flatForm.get('dateAvailable')?.touched
+            "
+          >
+            {{ getErrorMessage("dateAvailable") }}
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="hasAC" />
+            Has Air Conditioning
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="!flatForm.valid">
+        Save Flat
+      </button>
+    </form>
+  </div>
+</div>

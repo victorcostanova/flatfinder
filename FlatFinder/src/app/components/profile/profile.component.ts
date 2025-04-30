@@ -4,12 +4,12 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 
 @Component({
-  selector: 'app-favflats',
+  selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent],
-  templateUrl: './favflats.component.html',
-  styleUrls: ['./favflats.component.css'],
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css'],
 })
-export class FavflatsComponent {
+export class ProfileComponent {
   constructor() {}
 }

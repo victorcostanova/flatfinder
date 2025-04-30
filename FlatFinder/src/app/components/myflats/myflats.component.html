@@ -1,1 +1,68 @@
-<p>myflats works!</p>
+<app-header></app-header>
+<div class="container">
+  <div class="header-section">
+    <h1>My Flats</h1>
+    <button class="add-flat-btn" routerLink="/new-flat">
+      <span class="plus-icon">+</span> Add New Flat
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading your flats...</div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="flats-grid">
+    <div *ngFor="let flat of flats" class="flat-card">
+      <div class="flat-header">
+        <h2>{{ flat.city }}</h2>
+        <span class="price">${{ flat.rentPrice }}/month</span>
+      </div>
+
+      <div class="flat-details">
+        <div class="detail-row">
+          <span class="label">Address:</span>
+          <span>{{ flat.streetName }} {{ flat.streetNumber }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Area:</span>
+          <span>{{ flat.areaSize }} m²</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Year Built:</span>
+          <span>{{ flat.yearBuilt }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Available From:</span>
+          <span>{{ formatDate(flat.dateAvailable) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Amenities:</span>
+          <span>{{ flat.hasAC ? "Air Conditioning" : "No AC" }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Listed:</span>
+          <span>{{ formatDate(flat.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div class="flat-actions">
+        <button class="edit-btn" [routerLink]="['/edit-flat', flat.id]">
+          Edit
+        </button>
+        <button class="delete-btn" (click)="deleteFlat(flat.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && flats.length === 0" class="no-flats">
+    You haven't listed any flats yet.
+    <a routerLink="/new-flat" class="add-flat-link">Add your first flat</a>
+  </div>
+</div>

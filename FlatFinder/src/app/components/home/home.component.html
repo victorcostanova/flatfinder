@@ -1,1 +1,55 @@
-<p>home works!</p>
+<app-header></app-header>
+<div class="container">
+  <h1>Available Flats</h1>
+
+  <div *ngIf="loading" class="loading">Loading flats...</div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="flats-grid">
+    <div *ngFor="let flat of flats" class="flat-card">
+      <div class="flat-header">
+        <h2>{{ flat.city }}</h2>
+        <span class="price">€{{ flat.rentPrice }}/month</span>
+      </div>
+
+      <div class="flat-details">
+        <div class="detail-row">
+          <span class="label">Address:</span>
+          <span>{{ flat.streetName }} {{ flat.streetNumber }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Area:</span>
+          <span>{{ flat.areaSize }} m²</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Year Built:</span>
+          <span>{{ flat.yearBuilt }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Available From:</span>
+          <span>{{ formatDate(flat.dateAvailable) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Amenities:</span>
+          <span>{{ flat.hasAC ? "Air Conditioning" : "No AC" }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Listed:</span>
+          <span>{{ formatDate(flat.createdAt) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && flats.length === 0" class="no-flats">
+    No flats available at the moment.
+  </div>
+</div>

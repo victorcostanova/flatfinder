@@ -1,0 +1,16 @@
+<header class="header">
+  <div class="header-left">
+    <h1 class="logo">Flat Finder</h1>
+  </div>
+
+  <nav class="header-nav">
+    <a routerLink="/new-flat" class="nav-link">New Flat</a>
+    <a routerLink="/myflats" class="nav-link">My Flats</a>
+    <a routerLink="/favourites" class="nav-link">Favourites</a>
+    <a routerLink="/profile" class="nav-link">My Profile</a>
+  </nav>
+
+  <div class="header-right">
+    <button (click)="onLogout()" class="logout-btn">Logout</button>
+  </div>
+</header>
