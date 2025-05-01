@@ -27,7 +27,6 @@ interface Flat {
 })
 export class HomeComponent implements OnInit {
   flats: Flat[] = [];
-  loading = true;
   error = '';
 
   constructor(private firestore: Firestore) {}
@@ -43,8 +42,6 @@ export class HomeComponent implements OnInit {
     } catch (error) {
       console.error('Error fetching flats:', error);
       this.error = 'Failed to load flats';
-    } finally {
-      this.loading = false;
     }
   }
 
