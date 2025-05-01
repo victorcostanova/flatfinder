@@ -6,7 +6,6 @@
     <div *ngIf="loading" class="loading">Loading profile data...</div>
 
     <div *ngIf="!loading" class="profile-form">
-      <!-- Profile Information Form -->
       <form [formGroup]="profileForm">
         <div class="form-row">
           <mat-form-field appearance="outline">
@@ -86,84 +85,76 @@
       </form>
 
       <!-- Password Change Section -->
-      <div class="password-section">
-        <mat-accordion>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title> Change Password </mat-panel-title>
-            </mat-expansion-panel-header>
+      <mat-accordion class="password-section">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title> Change Password </mat-panel-title>
+          </mat-expansion-panel-header>
 
-            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Current Password</mat-label>
-                  <input
-                    matInput
-                    type="password"
-                    formControlName="currentPassword"
-                    required
-                  />
-                  <mat-error
-                    *ngIf="passwordForm.get('currentPassword')?.errors?.['required']"
-                  >
-                    Current password is required
-                  </mat-error>
-                </mat-form-field>
-              </div>
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+            <mat-form-field appearance="outline">
+              <mat-label>Current Password</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="currentPassword"
+                required
+              />
+              <mat-error
+                *ngIf="passwordForm.get('currentPassword')?.errors?.['required']"
+              >
+                Current password is required
+              </mat-error>
+            </mat-form-field>
 
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>New Password</mat-label>
-                  <input
-                    matInput
-                    type="password"
-                    formControlName="newPassword"
-                    required
-                  />
-                  <mat-error
-                    *ngIf="passwordForm.get('newPassword')?.errors?.['required']"
-                  >
-                    New password is required
-                  </mat-error>
-                  <mat-error
-                    *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']"
-                  >
-                    Password must be at least 6 characters
-                  </mat-error>
-                </mat-form-field>
-              </div>
+            <mat-form-field appearance="outline">
+              <mat-label>New Password</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="newPassword"
+                required
+              />
+              <mat-error
+                *ngIf="passwordForm.get('newPassword')?.errors?.['required']"
+              >
+                New password is required
+              </mat-error>
+              <mat-error
+                *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']"
+              >
+                Password must be at least 6 characters
+              </mat-error>
+            </mat-form-field>
 
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Confirm New Password</mat-label>
-                  <input
-                    matInput
-                    type="password"
-                    formControlName="confirmPassword"
-                    required
-                  />
-                  <mat-error
-                    *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']"
-                  >
-                    Please confirm your new password
-                  </mat-error>
-                </mat-form-field>
-              </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Confirm New Password</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="confirmPassword"
+                required
+              />
+              <mat-error
+                *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']"
+              >
+                Please confirm your new password
+              </mat-error>
+            </mat-form-field>
 
-              <div class="button-row">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  type="submit"
-                  [disabled]="!passwordForm.valid"
-                >
-                  Change Password
-                </button>
-              </div>
-            </form>
-          </mat-expansion-panel>
-        </mat-accordion>
-      </div>
+            <div class="button-row">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!passwordForm.valid"
+              >
+                Change Password
+              </button>
+            </div>
+          </form>
+        </mat-expansion-panel>
+      </mat-accordion>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import {
   FormBuilder,
@@ -47,8 +47,7 @@ export class ProfileComponent implements OnInit {
     private auth: Auth,
     private firestore: Firestore,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar,
-    private router: Router
+    private snackBar: MatSnackBar
   ) {
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -158,9 +157,6 @@ export class ProfileComponent implements OnInit {
 
           // Reset the form
           this.passwordForm.reset();
-
-          // Redirect to homepage
-          this.router.navigate(['/home']);
         }
       } catch (error: any) {
         console.error('Error changing password:', error);
