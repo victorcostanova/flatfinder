@@ -12,6 +12,7 @@ import {
   UserCredential,
 } from '@angular/fire/auth';
 import { BehaviorSubject } from 'rxjs';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -20,12 +21,22 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private auth: Auth, private router: Router) {
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+    private router: Router
+  ) {
     // Listen to authentication state changes
-    onAuthStateChanged(this.auth, (user) => {
+    onAuthStateChanged(this.auth, async (user) => {
       this.userSubject.next(user);
       if (!user) {
         this.router.navigate(['/login']);
+      } else {
+        // Check if user needs to complete profile
+        const userDoc = await getDoc(doc(this.firestore, 'users', user.uid));
+        if (!userDoc.exists() || !userDoc.data()['firstName']) {
+          this.router.navigate(['/complete-profile']);
+        }
       }
     });
 
@@ -51,13 +62,27 @@ export class AuthService {
     }
   }
 
-  async register(email: string, password: string): Promise<UserCredential> {
+  async register(
+    email: string,
+    password: string,
+    userData: any
+  ): Promise<UserCredential> {
     try {
       const result = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password
       );
+
+      // Save additional user data to Firestore
+      await setDoc(doc(this.firestore, 'users', result.user.uid), {
+        ...userData,
+        email,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isAdmin: false,
+      });
+
       localStorage.setItem('user', JSON.stringify(result.user));
       this.router.navigate(['/home']);
       return result;
@@ -80,10 +105,25 @@ export class AuthService {
   }
 
   async loginWithGoogle(): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(this.auth, provider);
-    localStorage.setItem('user', JSON.stringify(result.user));
-    this.router.navigate(['/home']);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(this.auth, provider);
+      localStorage.setItem('user', JSON.stringify(result.user));
+
+      // Check if user profile exists
+      const userDoc = await getDoc(
+        doc(this.firestore, 'users', result.user.uid)
+      );
+
+      if (!userDoc.exists() || !userDoc.data()['firstName']) {
+        await this.router.navigate(['/complete-profile']);
+      } else {
+        await this.router.navigate(['/home']);
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
   }
 
   isLoggedIn(): boolean {

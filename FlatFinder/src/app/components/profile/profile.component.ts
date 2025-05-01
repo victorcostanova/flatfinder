@@ -9,7 +9,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { Auth, user, updatePassword } from '@angular/fire/auth';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-profile',
@@ -32,6 +39,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatDatepickerModule,
     MatNativeDateModule,
     MatExpansionModule,
+    MatIconModule,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
@@ -39,9 +47,12 @@ import { MatExpansionModule } from '@angular/material/expansion';
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   passwordForm: FormGroup;
-  isEditing = false;
-  userData: any = null;
   loading = true;
+  editingField: { [key: string]: boolean } = {
+    firstName: false,
+    lastName: false,
+    birthDate: false,
+  };
 
   constructor(
     private auth: Auth,
@@ -53,85 +64,75 @@ export class ProfileComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       birthDate: ['', Validators.required],
+      email: [{ value: '', disabled: true }],
     });
 
-    this.passwordForm = this.fb.group(
-      {
-        currentPassword: ['', [Validators.required, Validators.minLength(6)]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]],
-      },
-      { validator: this.passwordMatchValidator }
-    );
+    this.passwordForm = this.fb.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
+    });
   }
 
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
-      ? null
-      : { mismatch: true };
-  }
-
-  ngOnInit() {
-    user(this.auth).subscribe(async (user) => {
-      if (user) {
-        const userDoc = doc(this.firestore, 'users', user.uid);
-        const userSnapshot = await getDoc(userDoc);
-
-        if (userSnapshot.exists()) {
-          this.userData = userSnapshot.data();
-          this.profileForm.patchValue({
-            firstName: this.userData.firstName || '',
-            lastName: this.userData.lastName || '',
-            birthDate: this.userData.birthDate
-              ? new Date(this.userData.birthDate)
-              : '',
-          });
-        }
-        this.loading = false;
+  async ngOnInit() {
+    const user = this.auth.currentUser;
+    if (user) {
+      const userDoc = await getDoc(doc(this.firestore, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        this.profileForm.patchValue({
+          firstName: userData['firstName'],
+          lastName: userData['lastName'],
+          birthDate: userData['birthDate']
+            ? new Date(userData['birthDate'])
+            : '',
+          email: user.email,
+        });
       }
-    });
+    }
+    this.loading = false;
   }
 
-  toggleEdit() {
-    this.isEditing = !this.isEditing;
-    if (!this.isEditing) {
-      this.profileForm.patchValue({
-        firstName: this.userData?.firstName || '',
-        lastName: this.userData?.lastName || '',
-        birthDate: this.userData?.birthDate
-          ? new Date(this.userData.birthDate)
-          : '',
-      });
+  toggleEdit(field: string) {
+    this.editingField[field] = !this.editingField[field];
+    if (!this.editingField[field]) {
+      // Reset the field value if canceling edit
+      const user = this.auth.currentUser;
+      if (user) {
+        getDoc(doc(this.firestore, 'users', user.uid)).then((userDoc) => {
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            this.profileForm
+              .get(field)
+              ?.patchValue(
+                field === 'birthDate'
+                  ? new Date(userData[field])
+                  : userData[field]
+              );
+          }
+        });
+      }
     }
   }
 
-  async saveProfile() {
-    if (this.profileForm.valid) {
+  async saveField(field: string) {
+    if (this.profileForm.get(field)?.valid) {
       try {
         const user = this.auth.currentUser;
-        if (user) {
-          const userDoc = doc(this.firestore, 'users', user.uid);
-          const formData = this.profileForm.value;
+        if (!user) return;
 
-          const userData = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            birthDate: formData.birthDate.toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
+        const value = this.profileForm.get(field)?.value;
+        const updateData = {
+          [field]: field === 'birthDate' ? value.toISOString() : value,
+          updatedAt: new Date().toISOString(),
+        };
 
-          await setDoc(userDoc, userData, { merge: true });
+        await updateDoc(doc(this.firestore, 'users', user.uid), updateData);
 
-          this.userData = {
-            ...this.userData,
-            ...userData,
-          };
-
-          this.isEditing = false;
-          this.snackBar.open('Profile updated successfully', 'Close', {
-            duration: 3000,
-          });
-        }
+        this.editingField[field] = false;
+        this.snackBar.open('Profile updated successfully!', 'Close', {
+          duration: 3000,
+        });
       } catch (error) {
         console.error('Error updating profile:', error);
         this.snackBar.open('Error updating profile', 'Close', {
@@ -145,32 +146,17 @@ export class ProfileComponent implements OnInit {
     if (this.passwordForm.valid) {
       try {
         const user = this.auth.currentUser;
-        if (user) {
-          await updatePassword(
-            user,
-            this.passwordForm.get('newPassword')?.value
-          );
+        if (!user) return;
 
-          this.snackBar.open('Password changed successfully', 'Close', {
-            duration: 3000,
-          });
+        await updatePassword(user, this.passwordForm.value.newPassword);
 
-          // Reset the form
-          this.passwordForm.reset();
-        }
-      } catch (error: any) {
+        this.passwordForm.reset();
+        this.snackBar.open('Password changed successfully!', 'Close', {
+          duration: 3000,
+        });
+      } catch (error) {
         console.error('Error changing password:', error);
-        this.snackBar.open(
-          error.message || 'Error changing password. Please try again.',
-          'Close',
-          {
-            duration: 3000,
-          }
-        );
-      }
-    } else {
-      if (this.passwordForm.errors?.['mismatch']) {
-        this.snackBar.open('New passwords do not match', 'Close', {
+        this.snackBar.open('Error changing password', 'Close', {
           duration: 3000,
         });
       }

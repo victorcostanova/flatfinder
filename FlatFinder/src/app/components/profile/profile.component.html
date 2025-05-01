@@ -1,160 +1,143 @@
 <app-header></app-header>
+
 <div class="container">
   <div class="profile-content">
     <h1>My Profile</h1>
 
-    <div *ngIf="loading" class="loading">Loading profile data...</div>
+    <div *ngIf="loading" class="loading">Loading profile...</div>
 
-    <div *ngIf="!loading" class="profile-form">
-      <form [formGroup]="profileForm">
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>First Name</mat-label>
-            <input
-              matInput
-              formControlName="firstName"
-              [readonly]="!isEditing"
-            />
-            <mat-error
-              *ngIf="profileForm.get('firstName')?.errors?.['required']"
-            >
-              First name is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Last Name</mat-label>
-            <input
-              matInput
-              formControlName="lastName"
-              [readonly]="!isEditing"
-            />
-            <mat-error
-              *ngIf="profileForm.get('lastName')?.errors?.['required']"
-            >
-              Last name is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Birth Date</mat-label>
-            <input
-              matInput
-              [matDatepicker]="picker"
-              formControlName="birthDate"
-              [readonly]="!isEditing"
-            />
-            <mat-datepicker-toggle
-              matIconSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            <mat-error
-              *ngIf="profileForm.get('birthDate')?.errors?.['required']"
-            >
-              Birth date is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="button-row">
+    <form *ngIf="!loading" [formGroup]="profileForm" class="profile-form">
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>First Name</mat-label>
+          <input
+            matInput
+            formControlName="firstName"
+            [readonly]="!editingField['firstName']"
+          />
           <button
-            mat-raised-button
-            color="primary"
-            *ngIf="!isEditing"
-            (click)="toggleEdit()"
+            mat-icon-button
+            matSuffix
+            (click)="toggleEdit('firstName')"
+            *ngIf="!editingField['firstName']"
           >
-            Edit Profile
+            <mat-icon>edit</mat-icon>
           </button>
-          <ng-container *ngIf="isEditing">
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="saveField('firstName')"
+            *ngIf="editingField['firstName']"
+            color="primary"
+          >
+            <mat-icon>check</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Last Name</mat-label>
+          <input
+            matInput
+            formControlName="lastName"
+            [readonly]="!editingField['lastName']"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="toggleEdit('lastName')"
+            *ngIf="!editingField['lastName']"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="saveField('lastName')"
+            *ngIf="editingField['lastName']"
+            color="primary"
+          >
+            <mat-icon>check</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Birth Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="birthDate"
+            [readonly]="!editingField['birthDate']"
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+            *ngIf="editingField['birthDate']"
+          ></mat-datepicker-toggle>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="toggleEdit('birthDate')"
+            *ngIf="!editingField['birthDate']"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="saveField('birthDate')"
+            *ngIf="editingField['birthDate']"
+            color="primary"
+          >
+            <mat-icon>check</mat-icon>
+          </button>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" readonly />
+        </mat-form-field>
+      </div>
+
+      <mat-expansion-panel class="password-section">
+        <mat-expansion-panel-header>
+          <mat-panel-title> Change Password </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <mat-form-field>
+            <mat-label>Current Password</mat-label>
+            <input matInput type="password" formControlName="currentPassword" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>New Password</mat-label>
+            <input matInput type="password" formControlName="newPassword" />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Confirm New Password</mat-label>
+            <input matInput type="password" formControlName="confirmPassword" />
+          </mat-form-field>
+
+          <div class="button-row">
             <button
               mat-raised-button
               color="primary"
-              (click)="saveProfile()"
-              [disabled]="!profileForm.valid"
+              type="submit"
+              [disabled]="!passwordForm.valid"
             >
-              Save Changes
+              Change Password
             </button>
-            <button mat-button (click)="toggleEdit()">Cancel</button>
-          </ng-container>
-        </div>
-      </form>
-
-      <!-- Password Change Section -->
-      <mat-accordion class="password-section">
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title> Change Password </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-            <mat-form-field appearance="outline">
-              <mat-label>Current Password</mat-label>
-              <input
-                matInput
-                type="password"
-                formControlName="currentPassword"
-                required
-              />
-              <mat-error
-                *ngIf="passwordForm.get('currentPassword')?.errors?.['required']"
-              >
-                Current password is required
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>New Password</mat-label>
-              <input
-                matInput
-                type="password"
-                formControlName="newPassword"
-                required
-              />
-              <mat-error
-                *ngIf="passwordForm.get('newPassword')?.errors?.['required']"
-              >
-                New password is required
-              </mat-error>
-              <mat-error
-                *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']"
-              >
-                Password must be at least 6 characters
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Confirm New Password</mat-label>
-              <input
-                matInput
-                type="password"
-                formControlName="confirmPassword"
-                required
-              />
-              <mat-error
-                *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']"
-              >
-                Please confirm your new password
-              </mat-error>
-            </mat-form-field>
-
-            <div class="button-row">
-              <button
-                mat-raised-button
-                color="primary"
-                type="submit"
-                [disabled]="!passwordForm.valid"
-              >
-                Change Password
-              </button>
-            </div>
-          </form>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </div>
+          </div>
+        </form>
+      </mat-expansion-panel>
+    </form>
   </div>
 </div>

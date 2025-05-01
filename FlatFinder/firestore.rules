@@ -7,6 +7,12 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
+    // Helper function to check if user is completing their profile
+    function isCompletingProfile() {
+      return !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+             !get(/databases/$(database)/documents/users/$(request.auth.uid)).data.firstName;
+    }
+
     match /flats/{flatId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && (request.resource.data.userId == request.auth.uid || isAdmin());
@@ -20,11 +26,27 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
+      // Permitir leitura se:
+      // 1. O usuário está acessando seus próprios dados
+      // 2. O usuário é admin
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      allow list: if isAdmin(); 
-      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow delete: if isAdmin(); 
+      
+      // Permitir listagem apenas para admins
+      allow list: if isAdmin();
+      
+      // Permitir criação/atualização se:
+      // 1. O usuário está criando/atualizando seus próprios dados
+      // 2. O usuário está completando seu perfil após login com Google
+      // 3. O usuário é admin
+      allow create, update: if request.auth != null && 
+        (
+          request.auth.uid == userId || 
+          (request.auth.uid == userId && isCompletingProfile()) ||
+          isAdmin()
+        );
+      
+      // Apenas admins podem deletar usuários
+      allow delete: if isAdmin();
     }
   }
 } 

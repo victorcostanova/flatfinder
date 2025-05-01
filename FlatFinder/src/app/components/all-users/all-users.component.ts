@@ -18,6 +18,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+interface Flat {
+  city: string;
+  price: number;
+}
+
 interface User {
   userId: string;
   email: string;
@@ -27,7 +32,8 @@ interface User {
   isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
-  flatsCount?: number;
+  flatsCount: number;
+  flats?: Flat[];
 }
 
 @Component({
@@ -59,49 +65,55 @@ export class AllUsersComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Check if user is admin
+    await this.checkAdminStatus();
+    if (this.isAdmin) {
+      await this.loadUsers();
+    }
+    this.loading = false;
+  }
+
+  private async checkAdminStatus() {
     const user = this.auth.currentUser;
     if (!user) {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/login']);
       return;
     }
 
     const userDoc = await getDoc(doc(this.firestore, 'users', user.uid));
-    if (!userDoc.exists() || !userDoc.data()['isAdmin']) {
-      this.snackBar.open('Access denied: Admin only area', 'Close', {
-        duration: 3000,
-      });
-      this.router.navigate(['/home']);
-      return;
+    if (userDoc.exists()) {
+      this.isAdmin = userDoc.data()['isAdmin'] || false;
     }
-
-    this.isAdmin = true;
-    await this.loadUsers();
   }
 
-  async loadUsers() {
+  private async loadUsers() {
     try {
-      const usersRef = collection(this.firestore, 'users');
-      const usersSnapshot = await getDocs(usersRef);
-      const usersPromises = usersSnapshot.docs.map(async (doc) => {
-        const userData = doc.data() as User;
-        userData.userId = doc.id;
+      const usersCollection = collection(this.firestore, 'users');
+      const usersSnapshot = await getDocs(usersCollection);
 
-        // Get flats count for each user
-        const flatsRef = collection(this.firestore, 'flats');
-        const flatsQuery = query(flatsRef, where('userId', '==', doc.id));
-        const flatsSnapshot = await getDocs(flatsQuery);
-        userData.flatsCount = flatsSnapshot.size;
+      this.users = await Promise.all(
+        usersSnapshot.docs.map(async (doc) => {
+          const userData = doc.data() as User;
+          const flatsQuery = query(
+            collection(this.firestore, 'flats'),
+            where('userId', '==', doc.id)
+          );
+          const flatsSnapshot = await getDocs(flatsQuery);
+          const flats = flatsSnapshot.docs.map((flatDoc) => ({
+            city: flatDoc.data()['city'] || 'Unknown',
+            price: flatDoc.data()['price'] || 0,
+          }));
 
-        return userData;
-      });
-
-      this.users = await Promise.all(usersPromises);
+          return {
+            ...userData,
+            userId: doc.id,
+            flatsCount: flats.length,
+            flats: flats,
+          };
+        })
+      );
     } catch (error) {
       console.error('Error loading users:', error);
       this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
-    } finally {
-      this.loading = false;
     }
   }
 

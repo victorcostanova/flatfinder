@@ -11,6 +11,7 @@ import { FlatPreviewComponent } from './components/flat-preview/flat-preview.com
 import { AuthGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
 import { AllUsersComponent } from './components/all-users/all-users.component';
+import { CompleteProfileComponent } from './components/complete-profile/complete-profile.component';
 
 export const routes: Routes = [
   {
@@ -22,6 +23,11 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent,
     canActivate: [LoginGuard],
+  },
+  {
+    path: 'complete-profile',
+    component: CompleteProfileComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'home',

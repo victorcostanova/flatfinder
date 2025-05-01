@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -38,7 +39,8 @@ export class RegisterComponent {
   constructor(
     private authService: AuthService,
     private fb: FormBuilder,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private snackBar: MatSnackBar
   ) {
     this.registerForm = this.fb.group(
       {
@@ -62,34 +64,33 @@ export class RegisterComponent {
   async onSubmit() {
     if (this.registerForm.valid) {
       try {
-        const formData = this.registerForm.value;
+        const { email, password, firstName, lastName, birthDate } =
+          this.registerForm.value;
 
-        // Register the user with Firebase Auth
+        const userData = {
+          firstName,
+          lastName,
+          birthDate: birthDate.toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
         const userCredential = await this.authService.register(
-          formData.email,
-          formData.password
+          email,
+          password,
+          userData
         );
 
-        if (userCredential && userCredential.user) {
-          // Save additional user data to Firestore
-          const userData = {
-            userId: userCredential.user.uid,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            birthDate: formData.birthDate.toISOString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-
-          // Save to Firestore users collection
-          await setDoc(
-            doc(this.firestore, 'users', userCredential.user.uid),
-            userData
-          );
-        }
+        this.snackBar.open('Registration successful!', 'Close', {
+          duration: 3000,
+        });
       } catch (error: any) {
-        this.error = error.message || 'An error occurred during registration';
+        console.error('Registration error:', error);
+        this.snackBar.open(
+          error.message || 'Registration failed. Please try again.',
+          'Close',
+          { duration: 3000 }
+        );
       }
     } else {
       if (this.registerForm.errors?.['mismatch']) {
