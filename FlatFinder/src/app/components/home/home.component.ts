@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
@@ -7,6 +7,8 @@ import { FavoritesService } from '../../services/favorites.service';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 interface Flat {
   id: string;
@@ -32,12 +34,14 @@ interface Flat {
     MatTableModule,
     MatIconModule,
     MatButtonModule,
+    MatSortModule, // Add MatSortModule to imports
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   flats: Flat[] = [];
+  dataSource: MatTableDataSource<Flat>;
   favoriteStatus: { [key: string]: boolean } = {};
   isProcessing: { [key: string]: boolean } = {};
   error = '';
@@ -49,13 +53,22 @@ export class HomeComponent implements OnInit {
     'actions',
   ];
 
+  @ViewChild(MatSort) sort!: MatSort;
+
   constructor(
     private firestore: Firestore,
     private favoritesService: FavoritesService
-  ) {}
+  ) {
+    this.dataSource = new MatTableDataSource<Flat>([]);
+  }
 
   async ngOnInit() {
     await this.loadFlats();
+  }
+
+  ngAfterViewInit() {
+    // Connect the sort directive to the data source after view init
+    this.dataSource.sort = this.sort;
   }
 
   async loadFlats() {
@@ -67,6 +80,9 @@ export class HomeComponent implements OnInit {
         ...doc.data(),
       })) as Flat[];
 
+      // Update the data source with the loaded flats
+      this.dataSource.data = this.flats;
+
       // Check favorite status for each flat
       for (const flat of this.flats) {
         this.favoriteStatus[flat.id] = await this.favoritesService.isFavorite(
@@ -75,7 +91,42 @@ export class HomeComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error loading flats:', error);
+      this.error = 'Failed to load flats. Please try again later.';
     }
+  }
+
+  // Custom sort function to handle the sorting
+  sortData(sort: Sort) {
+    if (!sort.active || sort.direction === '') {
+      // If no sorting or direction specified, revert to original data
+      this.dataSource.data = this.flats;
+      return;
+    }
+
+    // Create a new sorted array
+    this.dataSource.data = this.flats.slice().sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+
+      switch (sort.active) {
+        case 'city':
+          return this.compare(
+            a.city.toLowerCase(),
+            b.city.toLowerCase(),
+            isAsc
+          );
+        case 'areaSize':
+          return this.compare(a.areaSize, b.areaSize, isAsc);
+        case 'price':
+          return this.compare(a.rentPrice, b.rentPrice, isAsc);
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // Helper function for comparison
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
   async toggleFavorite(flat: Flat) {

@@ -39,6 +39,14 @@ h1 {
   padding: 16px 8px;
 }
 
+.mat-sort-header-container {
+  align-items: center;
+}
+
+::ng-deep .mat-sort-header-arrow {
+  color: white !important;
+}
+
 .mat-mdc-cell {
   color: #666;
   font-size: 14px;
