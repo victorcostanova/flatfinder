@@ -1,0 +1,50 @@
+<app-header></app-header>
+
+<div class="container">
+  <div class="content">
+    <h1>All Users</h1>
+
+    <div *ngIf="loading" class="loading">Loading users...</div>
+
+    <div *ngIf="!loading && !isAdmin" class="error-message">
+      Access denied. This page is only accessible to administrators.
+    </div>
+
+    <div *ngIf="!loading && isAdmin" class="users-grid">
+      <mat-card *ngFor="let user of users" class="user-card">
+        <mat-card-header>
+          <mat-card-title>
+            {{ user.firstName }} {{ user.lastName }}
+            <mat-chip-set>
+              <mat-chip *ngIf="user.isAdmin" color="primary" selected
+                >Admin</mat-chip
+              >
+            </mat-chip-set>
+          </mat-card-title>
+          <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="user-info">
+            <p><strong>Birth Date:</strong> {{ formatDate(user.birthDate) }}</p>
+            <p><strong>Published Flats:</strong> {{ user.flatsCount || 0 }}</p>
+            <p>
+              <strong>Member Since:</strong> {{ formatDate(user.createdAt) }}
+            </p>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="viewUserDetails(user.userId)"
+          >
+            <mat-icon>visibility</mat-icon>
+            View Details
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

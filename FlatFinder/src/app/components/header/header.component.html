@@ -3,14 +3,31 @@
     <h1 class="logo">Flat Finder</h1>
   </div>
 
-  <nav class="header-nav">
-    <a routerLink="/home" class="nav-link">Home</a>
-    <a routerLink="/myflats" class="nav-link">My Flats</a>
-    <a routerLink="/favourites" class="nav-link">Favourites</a>
-    <a routerLink="/profile" class="nav-link">My Profile</a>
+  <nav class="header-nav" *ngIf="isLoggedIn">
+    <a routerLink="/home" class="nav-link" routerLinkActive="active">Home</a>
+    <a routerLink="/myflats" class="nav-link" routerLinkActive="active"
+      >My Flats</a
+    >
+    <a routerLink="/favourites" class="nav-link" routerLinkActive="active"
+      >Favorites</a
+    >
+    <a routerLink="/profile" class="nav-link" routerLinkActive="active"
+      >My Profile</a
+    >
+    <a
+      routerLink="/all-users"
+      class="nav-link"
+      routerLinkActive="active"
+      *ngIf="isAdmin"
+      >All Users</a
+    >
   </nav>
 
   <div class="header-right">
-    <button (click)="onLogout()" class="logout-btn">Logout</button>
+    <button *ngIf="isLoggedIn" (click)="logout()" class="logout-btn">
+      Logout
+    </button>
+    <a *ngIf="!isLoggedIn" routerLink="/login" class="nav-link">Login</a>
+    <a *ngIf="!isLoggedIn" routerLink="/register" class="nav-link">Register</a>
   </div>
 </header>

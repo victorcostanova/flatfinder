@@ -10,6 +10,7 @@ import { EditFlatComponent } from './components/edit-flat/edit-flat.component';
 import { FlatPreviewComponent } from './components/flat-preview/flat-preview.component';
 import { AuthGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
+import { AllUsersComponent } from './components/all-users/all-users.component';
 
 export const routes: Routes = [
   {
@@ -56,6 +57,10 @@ export const routes: Routes = [
     path: 'flat/:id',
     component: FlatPreviewComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'all-users',
+    component: AllUsersComponent,
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
