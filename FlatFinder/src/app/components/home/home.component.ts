@@ -4,6 +4,9 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { Firestore, collection, getDocs } from '@angular/fire/firestore';
 import { FavoritesService } from '../../services/favorites.service';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 interface Flat {
   id: string;
@@ -22,7 +25,14 @@ interface Flat {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderComponent,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
@@ -31,6 +41,7 @@ export class HomeComponent implements OnInit {
   favoriteStatus: { [key: string]: boolean } = {};
   isProcessing: { [key: string]: boolean } = {};
   error = '';
+  displayedColumns: string[] = ['city', 'address', 'price', 'actions'];
 
   constructor(
     private firestore: Firestore,

@@ -7,41 +7,60 @@
     {{ error }}
   </div>
 
-  <div *ngIf="!error" class="flats-grid">
-    <div
-      *ngFor="let flat of flats"
-      class="flat-card"
-      [routerLink]="['/flat', flat.id]"
-    >
-      <div class="flat-header">
-        <h2>{{ flat.city }}</h2>
-        <p class="address">{{ flat.streetName }}, {{ flat.streetNumber }}</p>
-      </div>
-      <div class="flat-price">
-        <span class="price">${{ flat.rentPrice }}</span>
-        <span class="period">/month</span>
-      </div>
-      <div
-        class="favorite-icon"
-        (click)="$event.stopPropagation(); toggleFavorite(flat)"
-      >
-        <svg
-          [class.favorite]="favoriteStatus[flat.id]"
-          [class.processing]="isProcessing[flat.id]"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polygon
-            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-          ></polygon>
-        </svg>
-      </div>
-    </div>
+  <div *ngIf="!error" class="table-container mat-elevation-z8">
+    <table mat-table [dataSource]="flats" class="flats-table">
+      <!-- City Column -->
+      <ng-container matColumnDef="city">
+        <th mat-header-cell *matHeaderCellDef>City</th>
+        <td mat-cell *matCellDef="let flat">{{ flat.city }}</td>
+      </ng-container>
+
+      <!-- Address Column -->
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef>Address</th>
+        <td mat-cell *matCellDef="let flat">
+          {{ flat.streetName }} {{ flat.streetNumber }}
+        </td>
+      </ng-container>
+
+      <!-- Price Column -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let flat">
+          {{ flat.rentPrice | currency : "USD" : "symbol" : "1.0-0" }}/month
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let flat" class="actions-cell">
+          <div class="action-buttons">
+            <button
+              mat-icon-button
+              color="primary"
+              [routerLink]="['/flat', flat.id]"
+            >
+              <mat-icon>search</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="$event.stopPropagation(); toggleFavorite(flat)"
+            >
+              <mat-icon
+                [class.favorite]="favoriteStatus[flat.id]"
+                [class.processing]="isProcessing[flat.id]"
+              >
+                {{ favoriteStatus[flat.id] ? "star" : "star_border" }}
+              </mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
   </div>
 
   <div *ngIf="!error && flats.length === 0" class="no-flats">

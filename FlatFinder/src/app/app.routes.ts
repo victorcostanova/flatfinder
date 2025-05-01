@@ -12,6 +12,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
 import { AllUsersComponent } from './components/all-users/all-users.component';
 import { CompleteProfileComponent } from './components/complete-profile/complete-profile.component';
+import { UserDetailsComponent } from './components/user-details/user-details.component';
 
 export const routes: Routes = [
   {
@@ -67,6 +68,12 @@ export const routes: Routes = [
   {
     path: 'all-users',
     component: AllUsersComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'user-details/:id',
+    component: UserDetailsComponent,
+    canActivate: [AuthGuard],
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
