@@ -9,6 +9,7 @@ import {
   User,
   signInWithPopup,
   GoogleAuthProvider,
+  UserCredential,
 } from '@angular/fire/auth';
 import { BehaviorSubject } from 'rxjs';
 
@@ -50,7 +51,7 @@ export class AuthService {
     }
   }
 
-  async register(email: string, password: string): Promise<void> {
+  async register(email: string, password: string): Promise<UserCredential> {
     try {
       const result = await createUserWithEmailAndPassword(
         this.auth,
@@ -59,6 +60,7 @@ export class AuthService {
       );
       localStorage.setItem('user', JSON.stringify(result.user));
       this.router.navigate(['/home']);
+      return result;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;

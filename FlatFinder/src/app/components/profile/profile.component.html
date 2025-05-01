@@ -1,5 +1,169 @@
 <app-header></app-header>
 <div class="container">
-  <h1>My Profile</h1>
-  <p>This is your profile page. Your personal information will appear here.</p>
+  <div class="profile-content">
+    <h1>My Profile</h1>
+
+    <div *ngIf="loading" class="loading">Loading profile data...</div>
+
+    <div *ngIf="!loading" class="profile-form">
+      <!-- Profile Information Form -->
+      <form [formGroup]="profileForm">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input
+              matInput
+              formControlName="firstName"
+              [readonly]="!isEditing"
+            />
+            <mat-error
+              *ngIf="profileForm.get('firstName')?.errors?.['required']"
+            >
+              First name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input
+              matInput
+              formControlName="lastName"
+              [readonly]="!isEditing"
+            />
+            <mat-error
+              *ngIf="profileForm.get('lastName')?.errors?.['required']"
+            >
+              Last name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Birth Date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              formControlName="birthDate"
+              [readonly]="!isEditing"
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error
+              *ngIf="profileForm.get('birthDate')?.errors?.['required']"
+            >
+              Birth date is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="button-row">
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="!isEditing"
+            (click)="toggleEdit()"
+          >
+            Edit Profile
+          </button>
+          <ng-container *ngIf="isEditing">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="saveProfile()"
+              [disabled]="!profileForm.valid"
+            >
+              Save Changes
+            </button>
+            <button mat-button (click)="toggleEdit()">Cancel</button>
+          </ng-container>
+        </div>
+      </form>
+
+      <!-- Password Change Section -->
+      <div class="password-section">
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Change Password </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Current Password</mat-label>
+                  <input
+                    matInput
+                    type="password"
+                    formControlName="currentPassword"
+                    required
+                  />
+                  <mat-error
+                    *ngIf="passwordForm.get('currentPassword')?.errors?.['required']"
+                  >
+                    Current password is required
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>New Password</mat-label>
+                  <input
+                    matInput
+                    type="password"
+                    formControlName="newPassword"
+                    required
+                  />
+                  <mat-error
+                    *ngIf="passwordForm.get('newPassword')?.errors?.['required']"
+                  >
+                    New password is required
+                  </mat-error>
+                  <mat-error
+                    *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']"
+                  >
+                    Password must be at least 6 characters
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Confirm New Password</mat-label>
+                  <input
+                    matInput
+                    type="password"
+                    formControlName="confirmPassword"
+                    required
+                  />
+                  <mat-error
+                    *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']"
+                  >
+                    Please confirm your new password
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="button-row">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!passwordForm.valid"
+                >
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+  </div>
 </div>
