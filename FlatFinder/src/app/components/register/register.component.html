@@ -27,8 +27,20 @@
         />
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          required
+          placeholder="Confirm your password"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        {{ error }}
       </div>
 
       <button type="submit" class="submit-btn">Register</button>

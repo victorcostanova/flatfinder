@@ -1,33 +1,39 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
-  email = '';
-  password = '';
-  errorMessage = '';
+  email: string = '';
+  password: string = '';
+  confirmPassword: string = '';
+  error: string = '';
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private authService: AuthService) {}
 
   async onSubmit() {
+    if (!this.email || !this.password || !this.confirmPassword) {
+      this.error = 'Please fill in all fields';
+      return;
+    }
+
+    if (this.password !== this.confirmPassword) {
+      this.error = 'Passwords do not match';
+      return;
+    }
+
     try {
-      await createUserWithEmailAndPassword(
-        this.auth,
-        this.email,
-        this.password
-      );
-      this.router.navigate(['/home']);
+      await this.authService.register(this.email, this.password);
     } catch (error: any) {
-      this.errorMessage = error.message;
+      this.error = error.message || 'An error occurred during registration';
     }
   }
 }

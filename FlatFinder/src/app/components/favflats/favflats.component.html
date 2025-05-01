@@ -1,5 +1,50 @@
 <app-header></app-header>
+
 <div class="container">
-  <h1>Favourite Flats</h1>
-  <p>This is the Favourites page. Your saved properties will appear here.</p>
+  <h1>Favorite Flats</h1>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!error" class="flats-grid">
+    <div
+      *ngFor="let flat of flats"
+      class="flat-card"
+      [routerLink]="['/flat', flat.id]"
+    >
+      <div class="flat-header">
+        <h2>{{ flat.city }}</h2>
+        <p class="address">{{ flat.streetName }} {{ flat.streetNumber }}</p>
+      </div>
+      <div class="flat-price">
+        <span class="price">${{ flat.rentPrice }}</span>
+        <span class="period">/month</span>
+      </div>
+      <div
+        class="favorite-icon"
+        (click)="$event.stopPropagation(); toggleFavorite(flat)"
+      >
+        <svg
+          class="favorite"
+          [class.processing]="isProcessing[flat.id]"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          ></polygon>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!error && flats.length === 0" class="no-flats">
+    No favorite flats yet.
+  </div>
 </div>

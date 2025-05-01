@@ -1,44 +1,41 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import {
-  Auth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from '@angular/fire/auth';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  email = '';
-  password = '';
-  errorMessage = '';
+  email: string = '';
+  password: string = '';
+  error: string = '';
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private authService: AuthService) {}
 
   async onSubmit() {
+    if (!this.email || !this.password) {
+      this.error = 'Please fill in all fields';
+      return;
+    }
+
     try {
-      await signInWithEmailAndPassword(this.auth, this.email, this.password);
-      this.router.navigate(['/home']);
+      await this.authService.login(this.email, this.password);
     } catch (error: any) {
-      this.errorMessage = error.message;
+      this.error = error.message || 'An error occurred during login';
     }
   }
 
   async loginWithGoogle() {
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(this.auth, provider);
-      this.router.navigate(['/home']);
+      await this.authService.loginWithGoogle();
     } catch (error: any) {
-      this.errorMessage = error.message;
+      this.error = error.message || 'An error occurred during Google login';
     }
   }
 }

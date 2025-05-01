@@ -1,16 +1,108 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 6rem 2rem;
-  text-align: center;
+  padding: 2rem;
 }
 
 h1 {
   color: #333;
-  margin-bottom: 1rem;
+  margin: 4rem 0 2rem;
+  text-align: center;
 }
 
-p {
+.error {
+  color: #e74c3c;
+  text-align: center;
+  padding: 2rem;
+}
+
+.flats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.flat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.flat-card:hover {
+  transform: translateY(-5px);
+}
+
+.flat-header {
+  margin-bottom: 15px;
+}
+
+.flat-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.address {
   color: #666;
-  font-size: 1.1rem;
+  margin: 5px 0;
+}
+
+.flat-price {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.price {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.period {
+  color: #666;
+}
+
+.favorite-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.favorite-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #ffd700;
+  stroke: #ffd700;
+  transition: all 0.2s;
+}
+
+.favorite-icon svg.processing {
+  opacity: 0.5;
+}
+
+.no-flats {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  h1 {
+    margin: 3rem 0 1.5rem;
+  }
+
+  .flats-grid {
+    grid-template-columns: 1fr;
+  }
 }

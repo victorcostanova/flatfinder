@@ -1,12 +1,12 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 6rem 2rem;
+  padding: 2rem;
 }
 
 h1 {
   color: #333;
-  margin-bottom: 2rem;
+  margin: 4rem 0 2rem;
   text-align: center;
 }
 
@@ -22,70 +22,106 @@ h1 {
   color: #e74c3c;
 }
 
+.error-message {
+  color: #dc3545;
+  padding: 1rem;
+  background: #f8d7da;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
 .flats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 20px;
+  padding: 20px;
 }
 
 .flat-card {
-  background-color: white;
+  background: white;
   border-radius: 8px;
+  padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
 }
 
 .flat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
 }
 
 .flat-header {
-  padding: 1.5rem;
-  background-color: #4a90e2;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-bottom: 15px;
 }
 
 .flat-header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  color: #333;
+}
+
+.address {
+  color: #666;
+  margin: 5px 0;
+}
+
+.flat-price {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
 }
 
 .price {
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
-.flat-details {
-  padding: 1.5rem;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #eee;
-}
-
-.detail-row:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.label {
+.period {
   color: #666;
-  font-weight: 500;
+}
+
+.favorite-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.favorite-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #666;
+  transition: all 0.2s;
+}
+
+.favorite-icon svg.favorite {
+  fill: #ffd700;
+  stroke: #ffd700;
+}
+
+.favorite-icon svg.processing {
+  opacity: 0.5;
+}
+
+.favorite-icon:hover svg:not(.favorite) {
+  stroke: #ffd700;
+}
+
+.no-flats {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 6rem 1rem;
+    padding: 1rem;
+  }
+
+  h1 {
+    margin: 3rem 0 1.5rem;
   }
 
   .flats-grid {
