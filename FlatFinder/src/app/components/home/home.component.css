@@ -53,15 +53,19 @@ h1 {
 
 .flat-header {
   margin-bottom: 15px;
+  background-color: #1e88e5;
+  padding: 15px;
+  border-radius: 8px 8px 0 0;
+  margin: -20px -20px 15px -20px;
 }
 
 .flat-header h2 {
   margin: 0;
-  color: #333;
+  color: white;
 }
 
 .address {
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   margin: 5px 0;
 }
 
