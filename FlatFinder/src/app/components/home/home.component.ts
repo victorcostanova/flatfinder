@@ -41,7 +41,13 @@ export class HomeComponent implements OnInit {
   favoriteStatus: { [key: string]: boolean } = {};
   isProcessing: { [key: string]: boolean } = {};
   error = '';
-  displayedColumns: string[] = ['city', 'address', 'price', 'actions'];
+  displayedColumns: string[] = [
+    'city',
+    'address',
+    'areaSize',
+    'price',
+    'actions',
+  ];
 
   constructor(
     private firestore: Firestore,

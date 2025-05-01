@@ -36,29 +36,39 @@ h1 {
   font-weight: bold;
   color: white;
   font-size: 14px;
+  padding: 16px 8px;
 }
 
 .mat-mdc-cell {
   color: #666;
   font-size: 14px;
+  padding: 16px 8px;
 }
 
-td.mat-mdc-cell {
-  padding: 16px;
+/* Column specific styles */
+.mat-column-city {
+  width: 120px;
+  padding-left: 16px;
 }
 
-/* Styles for the actions column */
+.mat-column-address {
+  width: 200px;
+  padding-right: 16px;
+}
+
+.mat-column-price {
+  width: 140px;
+}
+
+.mat-column-areaSize {
+  width: 100px;
+}
+
+/* Push actions to the far right */
 .mat-column-actions {
   width: 120px;
   text-align: right;
-}
-
-th.mat-column-actions {
-  text-align: right;
-}
-
-td.mat-column-actions {
-  padding-right: 8px !important;
+  padding-right: 16px;
 }
 
 .actions-cell {
