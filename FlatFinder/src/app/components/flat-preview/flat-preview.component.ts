@@ -46,8 +46,14 @@ export class FlatPreviewComponent implements OnInit {
     }
 
     try {
-      const flatDoc = doc(this.firestore, 'flats', flatId);
-      const flatSnap = await getDoc(flatDoc);
+      const flatDocRef = doc(this.firestore, 'flats', flatId);
+      const flatSnapPromise = getDoc(flatDocRef);
+      const isFavPromise = this.favoritesService.isFavorite(flatId);
+
+      const [flatSnap, isFavorite] = await Promise.all([
+        flatSnapPromise,
+        isFavPromise,
+      ]);
 
       if (!flatSnap.exists()) {
         this.router.navigate(['/home']);
@@ -69,7 +75,7 @@ export class FlatPreviewComponent implements OnInit {
         createdAt: data['createdAt'],
       };
 
-      this.isFavorite = await this.favoritesService.isFavorite(flatId);
+      this.isFavorite = isFavorite;
     } catch (error) {
       console.error('Error loading flat:', error);
       this.router.navigate(['/home']);
@@ -91,7 +97,6 @@ export class FlatPreviewComponent implements OnInit {
       await this.router.navigate(['/favourites']);
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      // You might want to show an error message to the user here
     } finally {
       this.isProcessing = false;
     }

@@ -34,7 +34,7 @@ interface Flat {
     MatTableModule,
     MatIconModule,
     MatButtonModule,
-    MatSortModule, // Add MatSortModule to imports
+    MatSortModule,
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
@@ -63,7 +63,7 @@ export class HomeComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.loadFlats();
+    this.loadFlats();
   }
 
   ngAfterViewInit() {
@@ -84,11 +84,13 @@ export class HomeComponent implements OnInit {
       this.dataSource.data = this.flats;
 
       // Check favorite status for each flat
-      for (const flat of this.flats) {
-        this.favoriteStatus[flat.id] = await this.favoritesService.isFavorite(
-          flat.id
-        );
-      }
+      const statusList = await Promise.all(
+        this.flats.map((flat) => this.favoritesService.isFavorite(flat.id))
+      );
+
+      this.flats.forEach((flat, index) => {
+        this.favoriteStatus[flat.id] = statusList[index];
+      });
     } catch (error) {
       console.error('Error loading flats:', error);
       this.error = 'Failed to load flats. Please try again later.';
@@ -135,10 +137,10 @@ export class HomeComponent implements OnInit {
     this.isProcessing[flat.id] = true;
     try {
       if (this.favoriteStatus[flat.id]) {
-        await this.favoritesService.removeFromFavorites(flat.id);
+        this.favoritesService.removeFromFavorites(flat.id);
         this.favoriteStatus[flat.id] = false;
       } else {
-        await this.favoritesService.addToFavorites(flat);
+        this.favoritesService.addToFavorites(flat);
         this.favoriteStatus[flat.id] = true;
       }
     } catch (error) {

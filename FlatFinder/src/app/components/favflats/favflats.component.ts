@@ -49,7 +49,7 @@ export class FavflatsComponent implements OnInit {
 
     this.isProcessing[flat.id] = true;
     try {
-      await this.favoritesService.removeFromFavorites(flat.id);
+      this.favoritesService.removeFromFavorites(flat.id);
       // Remove the flat from the list after successful removal
       this.flats = this.flats.filter((f) => f.id !== flat.id);
     } catch (error) {
