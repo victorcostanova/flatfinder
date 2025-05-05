@@ -39,11 +39,31 @@ h1 {
   padding: 16px 8px;
 }
 
+/* Make sort icons always visible */
 .mat-sort-header-container {
+  display: flex;
   align-items: center;
+  gap: 4px;
+}
+
+.mat-sort-header-arrow {
+  opacity: 1 !important;
+  color: white !important;
+}
+
+.mat-sort-header-indicator {
+  color: white !important;
+}
+
+.mat-sort-header-button {
+  color: white !important;
 }
 
 ::ng-deep .mat-sort-header-arrow {
+  color: white !important;
+}
+
+::ng-deep .mat-sort-header-indicator {
   color: white !important;
 }
 
