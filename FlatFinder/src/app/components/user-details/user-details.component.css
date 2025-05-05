@@ -117,3 +117,21 @@ mat-card-actions {
   margin-top: auto;
   border-top: 1px solid #eee;
 }
+
+.admin-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.admin-actions button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-actions button mat-icon {
+  margin-right: 4px;
+}

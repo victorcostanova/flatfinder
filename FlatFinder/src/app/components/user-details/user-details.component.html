@@ -42,6 +42,32 @@
               <span class="value">{{ formatDate(user.updatedAt) }}</span>
             </div>
           </div>
+
+          <!-- Admin Actions -->
+          <div *ngIf="isAdmin" class="admin-actions">
+            <button
+              *ngIf="!user.isAdmin"
+              mat-raised-button
+              color="primary"
+              (click)="makeAdmin()"
+            >
+              <mat-icon>admin_panel_settings</mat-icon>
+              Make Admin
+            </button>
+            <button
+              *ngIf="user.isAdmin"
+              mat-raised-button
+              color="accent"
+              (click)="removeAdmin()"
+            >
+              <mat-icon>admin_panel_settings</mat-icon>
+              Remove Admin
+            </button>
+            <button mat-raised-button color="warn" (click)="deleteUser()">
+              <mat-icon>delete</mat-icon>
+              Delete User
+            </button>
+          </div>
         </mat-card-content>
       </mat-card>
 

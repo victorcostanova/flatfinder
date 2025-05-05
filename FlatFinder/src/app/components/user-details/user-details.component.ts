@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
@@ -10,6 +10,9 @@ import {
   where,
   doc,
   getDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
 } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { MatCardModule } from '@angular/material/card';
@@ -17,6 +20,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  MatDialog,
+  MatDialogModule,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 
 interface Flat {
   id: string;
@@ -53,6 +61,7 @@ interface User {
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatDialogModule,
   ],
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.css'],
@@ -68,7 +77,8 @@ export class UserDetailsComponent implements OnInit {
     private auth: Auth,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   async ngOnInit() {
@@ -159,4 +169,118 @@ export class UserDetailsComponent implements OnInit {
   goBack() {
     this.router.navigate(['/all-users']);
   }
+
+  async makeAdmin() {
+    if (!this.user || !this.isAdmin) return;
+
+    try {
+      const userRef = doc(this.firestore, 'users', this.user.userId);
+      await updateDoc(userRef, {
+        isAdmin: true,
+        updatedAt: new Date().toISOString(),
+      });
+
+      this.user.isAdmin = true;
+      this.snackBar.open('User is now an admin', 'Close', { duration: 3000 });
+    } catch (error) {
+      console.error('Error making user admin:', error);
+      this.snackBar.open('Error making user admin', 'Close', {
+        duration: 3000,
+      });
+    }
+  }
+
+  async removeAdmin() {
+    if (!this.user || !this.isAdmin) return;
+
+    try {
+      const userRef = doc(this.firestore, 'users', this.user.userId);
+      await updateDoc(userRef, {
+        isAdmin: false,
+        updatedAt: new Date().toISOString(),
+      });
+
+      this.user.isAdmin = false;
+      this.snackBar.open('Admin privileges removed', 'Close', {
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error removing admin privileges:', error);
+      this.snackBar.open('Error removing admin privileges', 'Close', {
+        duration: 3000,
+      });
+    }
+  }
+
+  async deleteUser() {
+    if (!this.user || !this.isAdmin) return;
+
+    const confirmDialog = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete User',
+        message:
+          'Are you sure you want to delete this user and all their flats? This action cannot be undone.',
+      },
+    });
+
+    confirmDialog.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          const batch = writeBatch(this.firestore);
+
+          // Delete all user's flats
+          const flatsQuery = query(
+            collection(this.firestore, 'flats'),
+            where('userId', '==', this.user!.userId)
+          );
+          const flatsSnapshot = await getDocs(flatsQuery);
+          flatsSnapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+
+          // Delete user document
+          const userRef = doc(this.firestore, 'users', this.user!.userId);
+          batch.delete(userRef);
+
+          await batch.commit();
+
+          this.snackBar.open(
+            'User and all their flats have been deleted',
+            'Close',
+            {
+              duration: 3000,
+            }
+          );
+          this.router.navigate(['/all-users']);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          this.snackBar.open('Error deleting user', 'Close', {
+            duration: 3000,
+          });
+        }
+      }
+    });
+  }
+}
+
+@Component({
+  selector: 'app-confirm-dialog',
+  template: `
+    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <mat-dialog-content>{{ data.message }}</mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="false">Cancel</button>
+      <button mat-raised-button color="warn" [mat-dialog-close]="true">
+        Delete
+      </button>
+    </mat-dialog-actions>
+  `,
+  standalone: true,
+  imports: [MatDialogModule, MatButtonModule],
+})
+export class ConfirmDialogComponent {
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string }
+  ) {}
 }
