@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { HeaderComponent } from "../header/header.component";
 import {
   Firestore,
+  Timestamp,
   doc,
   getDoc,
   collection,
@@ -35,9 +36,9 @@ interface Flat {
   hasAC: boolean;
   yearBuilt: number;
   rentPrice: number;
-  dateAvailable: Date;
+  dateAvailable: any;
   userId: string;
-  createdAt: Date;
+  createdAt: any;
 }
 
 interface Message {
@@ -46,7 +47,7 @@ interface Message {
   senderId: string;
   receiverId: string;
   message: string;
-  createdAt: string;
+  createdAt: Date;
   read: boolean;
 }
 
@@ -110,7 +111,7 @@ export class FlatPreviewComponent implements OnInit {
         return;
       }
 
-      const data = flatSnap.data();
+      const data = flatSnap.data() as Omit<Flat, "id">;
       this.flat = {
         id: flatSnap.id,
         city: data["city"],
@@ -142,7 +143,7 @@ export class FlatPreviewComponent implements OnInit {
         senderId: this.currentUserId,
         receiverId: this.flat.userId,
         message: this.message.trim(),
-        createdAt: new Date().toISOString(),
+        createdAt: Timestamp.now(),
         read: false,
       };
 
@@ -161,32 +162,49 @@ export class FlatPreviewComponent implements OnInit {
   }
 
   async showMessageHistory() {
-    if (!this.flat || !this.currentUserId) return;
+    if (!this.flat || !this.currentUserId) {
+      console.error("Flat or currentUserId is missing");
+      return;
+    }
 
     try {
       const messagesQuery = query(
         collection(this.firestore, "messages"),
         where("flatId", "==", this.flat.id),
-        where("senderId", "==", this.currentUserId),
         orderBy("createdAt", "desc")
       );
 
       const messagesSnapshot = await getDocs(messagesQuery);
-      this.messages = messagesSnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as Message)
-      );
 
-      this.dialog.open(MessageHistoryDialog, {
-        width: "500px",
-        data: {
-          messages: this.messages,
-          flatAddress: `${this.flat.streetName}, ${this.flat.streetNumber}, ${this.flat.city}`,
-        },
+      this.messages = messagesSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          flatId: data["flatId"],
+          senderId: data["senderId"],
+          receiverId: data["receiverId"],
+          message: data["message"],
+          createdAt: data["createdAt"]?.toDate() || new Date(),
+          read: data["read"],
+        } as Message;
       });
+
+      const dialogData = {
+        flatAddress: `${this.flat.streetName}, ${this.flat.streetNumber}, ${this.flat.city}`,
+        messages: this.messages,
+      };
+
+      if (this.messages.length === 0) {
+        this.dialog.open(NoMessagesDialog, {
+          width: "400px",
+          data: { flatAddress: dialogData.flatAddress },
+        });
+      } else {
+        this.dialog.open(MessageHistoryDialog, {
+          width: "500px",
+          data: dialogData,
+        });
+      }
     } catch (error) {
       console.error("Error loading message history:", error);
       this.snackBar.open("Error loading message history", "Close", {
@@ -273,6 +291,39 @@ export class MessageHistoryDialog {
     @Inject(MAT_DIALOG_DATA)
     public data: {
       messages: Message[];
+      flatAddress: string;
+    }
+  ) {}
+}
+
+@Component({
+  selector: "no-messages-dialog",
+  template: `
+    <h2 mat-dialog-title>No Messages Yet</h2>
+    <mat-dialog-content>
+      <p>You haven't sent any messages for this flat yet.</p>
+      <p class="flat-address">{{ data.flatAddress }}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>
+  `,
+  styles: [
+    `
+      .flat-address {
+        color: #666;
+        margin-top: 1rem;
+        font-style: italic;
+      }
+    `,
+  ],
+  standalone: true,
+  imports: [CommonModule, MatDialogModule, MatButtonModule],
+})
+export class NoMessagesDialog {
+  constructor(
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
       flatAddress: string;
     }
   ) {}
