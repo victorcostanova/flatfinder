@@ -26,22 +26,15 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      
-      
       allow list: if isAdmin();
-      
-  
       allow create, update: if request.auth != null && 
         (
           request.auth.uid == userId || 
           (request.auth.uid == userId && isCompletingProfile()) ||
           isAdmin()
         );
-      
-      
-      allow delete: if isAdmin();
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
   }
 } 

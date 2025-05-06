@@ -94,3 +94,15 @@ mat-expansion-panel .button-row {
 mat-expansion-panel .button-row button {
   min-width: 150px;
 }
+
+.delete-account-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.delete-account-section button {
+  color: #514845 !important;
+  min-width: 200px;
+}

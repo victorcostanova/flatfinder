@@ -44,9 +44,9 @@
           </div>
 
           <!-- Admin Actions -->
-          <div *ngIf="isAdmin" class="admin-actions">
+          <div *ngIf="isAdmin || isOwnProfile" class="admin-actions">
             <button
-              *ngIf="!user.isAdmin"
+              *ngIf="isAdmin && !user.isAdmin"
               mat-raised-button
               color="primary"
               (click)="makeAdmin()"
@@ -55,7 +55,7 @@
               Make Admin
             </button>
             <button
-              *ngIf="user.isAdmin"
+              *ngIf="isAdmin && user.isAdmin"
               mat-raised-button
               color="accent"
               (click)="removeAdmin()"
@@ -65,7 +65,7 @@
             </button>
             <button mat-raised-button color="warn" (click)="deleteUser()">
               <mat-icon>delete</mat-icon>
-              Delete User
+              {{ isOwnProfile ? "Delete My Account" : "Delete User" }}
             </button>
           </div>
         </mat-card-content>

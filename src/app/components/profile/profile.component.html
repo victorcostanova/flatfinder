@@ -138,6 +138,14 @@
           </div>
         </form>
       </mat-expansion-panel>
+
+      <!-- Delete Account Section -->
+      <div *ngIf="!isAdmin" class="delete-account-section">
+        <button mat-raised-button color="warn" (click)="deleteAccount()">
+          <mat-icon>delete</mat-icon>
+          Delete My Account
+        </button>
+      </div>
     </form>
   </div>
 </div>
