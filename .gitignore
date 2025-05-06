@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+out-tsc/
+
+# Environment files
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
+# Angular
+.angular/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
+# Others
+.env
+.env.local
