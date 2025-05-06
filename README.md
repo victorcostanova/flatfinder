@@ -1,6 +1,11 @@
 # FlatFinder 🏠
 
 FlatFinder is a web application built with **Angular**, integrated with **Firebase Authentication** and **Cloud Firestore**. It allows users to create, save, and browse available flats (apartments), as well as favorite listings.
+***
+
+Developed by: Victor Costa Nova, Jacobo Jose Ramirez Araujo, Maria Valeria Castro Trujillo, and Jose Antonio Cerda Ocejo
+
+***
 
 ## 🔧 Setup Instructions
 
@@ -79,5 +84,5 @@ Build artifacts will be stored in the `dist/` directory.
 
 Feel free to contribute or report issues to help improve this project!
 
-Developed by: Victor Costa Nova, Jacobo Jose Ramirez Araujo, Maria Valeria Castro Trujillo, and Jose Antonio Cerda Ocejo
+
 
