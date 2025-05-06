@@ -32,31 +32,37 @@ export class FavflatsComponent implements OnInit {
 
   constructor(private favoritesService: FavoritesService) {}
 
-  async ngOnInit() {
-    await this.loadFavoriteFlats();
+  ngOnInit(): void {
+    this.loadFavoriteFlats(); // não bloqueia a renderização
   }
 
-  async loadFavoriteFlats() {
-    try {
-      this.flats = await this.favoritesService.getFavoriteFlats();
-    } catch (error) {
-      console.error('Error loading favorite flats:', error);
-    }
+  loadFavoriteFlats(): void {
+    this.favoritesService
+      .getFavoriteFlats()
+      .then((flats) => {
+        this.flats = flats;
+      })
+      .catch((error) => {
+        console.error('Error loading favorite flats:', error);
+        this.error = 'Erro ao carregar flats favoritos.';
+      });
   }
 
-  async toggleFavorite(flat: Flat) {
+  toggleFavorite(flat: Flat): void {
     if (this.isProcessing[flat.id]) return;
 
     this.isProcessing[flat.id] = true;
-    try {
-      this.favoritesService.removeFromFavorites(flat.id);
-      // Remove the flat from the list after successful removal
-      this.flats = this.flats.filter((f) => f.id !== flat.id);
-    } catch (error) {
-      console.error('Error removing favorite:', error);
-    } finally {
-      this.isProcessing[flat.id] = false;
-    }
+    this.favoritesService
+      .removeFromFavorites(flat.id)
+      .then(() => {
+        this.flats = this.flats.filter((f) => f.id !== flat.id);
+      })
+      .catch((error) => {
+        console.error('Erro ao remover dos favoritos:', error);
+      })
+      .finally(() => {
+        this.isProcessing[flat.id] = false;
+      });
   }
 
   formatDate(date: any): string {

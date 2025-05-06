@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
+  background-color: #e3e2dc;
+  height: 100%;
 }
 
 h1 {
@@ -32,7 +34,7 @@ h1 {
 }
 
 .mat-mdc-header-cell {
-  background-color: #4a90e2 !important;
+  background-color: #514845 !important;
   font-weight: bold;
   color: white;
   font-size: 14px;
@@ -163,7 +165,7 @@ h1 {
 
 .flat-header {
   margin-bottom: 15px;
-  background-color: #4a90e2;
+  background-color: #514845;
   padding: 15px;
   border-radius: 8px 8px 0 0;
   margin: -20px -20px 15px -20px;
@@ -188,7 +190,7 @@ h1 {
 .price {
   font-size: 1.5em;
   font-weight: bold;
-  color: #2c3e50;
+  color: #514845;
 }
 
 .period {

@@ -1,6 +1,13 @@
+:host {
+  display: block;
+  background-color: #e3e2dc;
+  min-height: 100vh;
+}
+
 .container {
   max-width: 800px;
   margin: 2rem auto;
+  margin-top: 5rem;
   padding: 0 1rem;
 }
 

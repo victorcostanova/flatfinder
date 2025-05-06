@@ -2,6 +2,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 6rem 2rem;
+  background-color: #e3e2dc;
 }
 
 .header-section {
@@ -21,7 +22,7 @@ h1 {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #4a90e2;
+  background-color: #514845;
   color: white;
   border: none;
   border-radius: 4px;
@@ -31,7 +32,7 @@ h1 {
 }
 
 .add-flat-btn:hover {
-  background-color: #357abd;
+  background-color: #665d5a;
 }
 
 .plus-icon {
@@ -72,7 +73,7 @@ h1 {
 
 .flat-header {
   padding: 1.5rem;
-  background-color: #4a90e2;
+  background-color: #514845;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -156,7 +157,7 @@ h1 {
 .add-flat-link {
   display: inline-block;
   margin-top: 1rem;
-  color: #4a90e2;
+  color: #514845;
   text-decoration: none;
   font-weight: 500;
 }

@@ -1,7 +1,10 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 5rem;
   padding: 2rem;
+  background-color: #e3e2dc;
+  height: 100%;
 }
 
 .flat-preview {
@@ -75,21 +78,30 @@
 }
 
 .price-section {
-  background: #f8f9fa;
+  background: #f0f0ed;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
 .price {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  flex-direction: column;
+  align-items: center;
 }
 
 .amount {
   font-size: 2rem;
   font-weight: bold;
-  color: #007bff;
+  color: #514845;
 }
 
 .period {
@@ -106,7 +118,7 @@
 
 .favorite-btn {
   padding: 0.75rem 1.5rem;
-  background: #007bff;
+  background: #514845;
   color: white;
   border: none;
   border-radius: 4px;
@@ -116,7 +128,7 @@
 }
 
 .favorite-btn:hover {
-  background: #0056b3;
+  background: #3d3634;
 }
 
 .favorite-btn.active {
@@ -129,7 +141,7 @@
 
 .back-button {
   padding: 0.75rem 1.5rem;
-  background: #6c757d;
+  background: #514845;
   color: white;
   border: none;
   border-radius: 4px;
@@ -139,5 +151,5 @@
 }
 
 .back-button:hover {
-  background: #5a6268;
+  background: #3d3634;
 }

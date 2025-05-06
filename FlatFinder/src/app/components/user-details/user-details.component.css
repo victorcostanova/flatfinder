@@ -1,6 +1,7 @@
 .container {
   max-width: 1200px;
   margin: 2rem auto;
+  margin-top: 5rem;
   padding: 0 1rem;
 }
 
@@ -19,6 +20,7 @@
 
 .back-button {
   margin-right: 1rem;
+  color: #514845 !important;
 }
 
 h1 {
@@ -108,7 +110,7 @@ h1 {
 .price {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #1976d2;
+  color: #514845;
   margin: 0.5rem 0 0;
 }
 
@@ -116,6 +118,10 @@ mat-card-actions {
   padding: 1rem;
   margin-top: auto;
   border-top: 1px solid #eee;
+}
+
+mat-card-actions button {
+  color: #514845 !important;
 }
 
 .admin-actions {
@@ -130,6 +136,7 @@ mat-card-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: #514845 !important;
 }
 
 .admin-actions button mat-icon {

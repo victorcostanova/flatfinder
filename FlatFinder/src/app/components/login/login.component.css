@@ -1,18 +1,30 @@
 .auth-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-image: url("/assets/images/signup.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-left: 10%;
 }
 
 .auth-card {
-  background-color: white;
+  background-color: #e3e2dc;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+}
+
+.logo-image {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto 1.5rem;
 }
 
 h2 {
@@ -59,7 +71,7 @@ input:focus {
 }
 
 .submit-btn {
-  background-color: #4a90e2;
+  background-color: #514845;
   color: white;
   padding: 0.75rem;
   border: none;
@@ -71,7 +83,7 @@ input:focus {
 }
 
 .submit-btn:hover {
-  background-color: #357abd;
+  background-color: #3d3634;
 }
 
 .divider {
@@ -99,10 +111,10 @@ input:focus {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: white;
-  color: #333;
+  background-color: #514845;
+  color: white;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #514845;
   border-radius: 4px;
   font-size: 1rem;
   font-weight: 500;
@@ -111,7 +123,7 @@ input:focus {
 }
 
 .google-btn:hover {
-  background-color: #f5f5f5;
+  background-color: #3d3634;
 }
 
 .google-icon {
@@ -126,7 +138,7 @@ input:focus {
 }
 
 .switch-btn {
-  color: #4a90e2;
+  color: #514845;
   text-decoration: none;
   font-weight: 500;
   margin-left: 0.25rem;
