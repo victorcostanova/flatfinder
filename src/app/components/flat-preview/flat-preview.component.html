@@ -55,5 +55,31 @@
       </button>
       <button routerLink="/home" class="back-button">Back to Home</button>
     </div>
+
+    <!-- Message Section -->
+    <div *ngIf="!isOwner" class="message-section">
+      <mat-form-field appearance="outline" class="message-input">
+        <mat-label>Send a message to the owner</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="message"
+          placeholder="Type your message here..."
+          rows="3"
+        ></textarea>
+      </mat-form-field>
+      <div class="message-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="sendMessage()"
+          [disabled]="!message.trim()"
+        >
+          Send Message
+        </button>
+        <button mat-raised-button color="accent" (click)="showMessageHistory()">
+          Message History
+        </button>
+      </div>
+    </div>
   </div>
 </div>
