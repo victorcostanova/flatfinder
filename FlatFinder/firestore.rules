@@ -26,18 +26,13 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      // Permitir leitura se:
-      // 1. O usuário está acessando seus próprios dados
-      // 2. O usuário é admin
+      
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       
-      // Permitir listagem apenas para admins
+      
       allow list: if isAdmin();
       
-      // Permitir criação/atualização se:
-      // 1. O usuário está criando/atualizando seus próprios dados
-      // 2. O usuário está completando seu perfil após login com Google
-      // 3. O usuário é admin
+  
       allow create, update: if request.auth != null && 
         (
           request.auth.uid == userId || 
@@ -45,7 +40,7 @@ service cloud.firestore {
           isAdmin()
         );
       
-      // Apenas admins podem deletar usuários
+      
       allow delete: if isAdmin();
     }
   }
