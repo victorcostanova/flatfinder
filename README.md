@@ -1,6 +1,6 @@
-# FlatFinder 🏠
+# Rent Ease 🏠
 
-FlatFinder is a web application built with **Angular**, integrated with **Firebase Authentication** and **Cloud Firestore**. It allows users to create, save, and browse available flats (apartments), as well as favorite listings.
+RentEase is a web application built with **Angular**, integrated with **Firebase Authentication** and **Cloud Firestore**. It allows users to create, save, and browse available flats (apartments), as well as favorite listings.
 ***
 
 Developed by: Victor Costa Nova, Jacobo Jose Ramirez Araujo, Maria Valeria Castro Trujillo, and Jose Antonio Cerda Ocejo
@@ -14,8 +14,7 @@ Follow these steps to clone and run the project locally:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/victorcostanova/flatfinder.git
-cd flatfinder
+git clone https://github.com/victorcostanova/rentease.git
 ```
 
 ### 2. Install dependencies
