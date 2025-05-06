@@ -78,3 +78,6 @@ ng build
 Build artifacts will be stored in the `dist/` directory.
 
 Feel free to contribute or report issues to help improve this project!
+
+Developed by: Victor Costa Nova, Jacobo Jose Ramirez Araujo, Maria Valeria Castro Trujillo, and Jose Antonio Cerda Ocejo
+
