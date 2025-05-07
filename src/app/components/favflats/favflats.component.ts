@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { HeaderComponent } from '../header/header.component';
-import { FavoritesService } from '../../services/favorites.service';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+import { HeaderComponent } from "../header/header.component";
+import { FavoritesService } from "../../services/favorites.service";
 
 interface Flat {
   id: string;
@@ -16,19 +16,20 @@ interface Flat {
   dateAvailable: Date;
   userId: string;
   createdAt: Date;
+  images?: string[];
 }
 
 @Component({
-  selector: 'app-favflats',
+  selector: "app-favflats",
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent],
-  templateUrl: './favflats.component.html',
-  styleUrls: ['./favflats.component.css'],
+  templateUrl: "./favflats.component.html",
+  styleUrls: ["./favflats.component.css"],
 })
 export class FavflatsComponent implements OnInit {
   flats: Flat[] = [];
   isProcessing: { [key: string]: boolean } = {};
-  error = '';
+  error = "";
 
   constructor(private favoritesService: FavoritesService) {}
 
@@ -43,8 +44,8 @@ export class FavflatsComponent implements OnInit {
         this.flats = flats;
       })
       .catch((error) => {
-        console.error('Error loading favorite flats:', error);
-        this.error = 'Erro ao carregar flats favoritos.';
+        console.error("Error loading favorite flats:", error);
+        this.error = "Erro ao carregar flats favoritos.";
       });
   }
 
@@ -58,7 +59,7 @@ export class FavflatsComponent implements OnInit {
         this.flats = this.flats.filter((f) => f.id !== flat.id);
       })
       .catch((error) => {
-        console.error('Erro ao remover dos favoritos:', error);
+        console.error("Erro ao remover dos favoritos:", error);
       })
       .finally(() => {
         this.isProcessing[flat.id] = false;

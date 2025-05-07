@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   Firestore,
   collection,
@@ -12,9 +12,9 @@ import {
   DocumentData,
   collectionData,
   DocumentReference,
-} from '@angular/fire/firestore';
-import { AuthService } from './auth.service';
-import { Observable } from 'rxjs';
+} from "@angular/fire/firestore";
+import { AuthService } from "./auth.service";
+import { Observable } from "rxjs";
 
 export interface Flat {
   id: string;
@@ -28,6 +28,7 @@ export interface Flat {
   dateAvailable: Date;
   userId: string;
   createdAt: Date;
+  images?: string[];
 }
 
 export interface Favorite {
@@ -38,7 +39,7 @@ export interface Favorite {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class FavoritesService {
   constructor(private firestore: Firestore, private authService: AuthService) {}
@@ -46,7 +47,7 @@ export class FavoritesService {
   async addToFavorites(flat: Flat): Promise<void> {
     try {
       const user = this.authService.getCurrentUser();
-      if (!user) throw new Error('No user logged in');
+      if (!user) throw new Error("No user logged in");
 
       const favoriteData: Favorite = {
         userId: user.uid,
@@ -54,11 +55,11 @@ export class FavoritesService {
         createdAt: new Date(),
       };
 
-      const favoritesRef = collection(this.firestore, 'favorites');
+      const favoritesRef = collection(this.firestore, "favorites");
       await addDoc(favoritesRef, favoriteData);
-      console.log('Flat added to favorites successfully');
+      console.log("Flat added to favorites successfully");
     } catch (error) {
-      console.error('Error adding flat to favorites:', error);
+      console.error("Error adding flat to favorites:", error);
       throw error;
     }
   }
@@ -66,13 +67,13 @@ export class FavoritesService {
   async removeFromFavorites(flatId: string): Promise<void> {
     try {
       const user = this.authService.getCurrentUser();
-      if (!user) throw new Error('No user logged in');
+      if (!user) throw new Error("No user logged in");
 
-      const favoritesRef = collection(this.firestore, 'favorites');
+      const favoritesRef = collection(this.firestore, "favorites");
       const q = query(
         favoritesRef,
-        where('userId', '==', user.uid),
-        where('flatId', '==', flatId)
+        where("userId", "==", user.uid),
+        where("flatId", "==", flatId)
       );
 
       const querySnapshot = await getDocs(q);
@@ -81,9 +82,9 @@ export class FavoritesService {
       );
 
       await Promise.all(deletePromises);
-      console.log('Flat removed from favorites successfully');
+      console.log("Flat removed from favorites successfully");
     } catch (error) {
-      console.error('Error removing flat from favorites:', error);
+      console.error("Error removing flat from favorites:", error);
       throw error;
     }
   }
@@ -93,17 +94,17 @@ export class FavoritesService {
       const user = this.authService.getCurrentUser();
       if (!user) return false;
 
-      const favoritesRef = collection(this.firestore, 'favorites');
+      const favoritesRef = collection(this.firestore, "favorites");
       const q = query(
         favoritesRef,
-        where('userId', '==', user.uid),
-        where('flatId', '==', flatId)
+        where("userId", "==", user.uid),
+        where("flatId", "==", flatId)
       );
 
       const querySnapshot = await getDocs(q);
       return !querySnapshot.empty;
     } catch (error) {
-      console.error('Error checking favorite status:', error);
+      console.error("Error checking favorite status:", error);
       return false;
     }
   }
@@ -114,33 +115,34 @@ export class FavoritesService {
       if (!user) return [];
 
       // Get all favorites for the current user
-      const favoritesRef = collection(this.firestore, 'favorites');
+      const favoritesRef = collection(this.firestore, "favorites");
       const favoritesQuery = query(
         favoritesRef,
-        where('userId', '==', user.uid)
+        where("userId", "==", user.uid)
       );
       const favoritesSnapshot = await getDocs(favoritesQuery);
 
       // Get the corresponding flats
       const flatsPromises = favoritesSnapshot.docs.map(async (favoriteDoc) => {
         const favoriteData = favoriteDoc.data() as Favorite;
-        const flatRef = doc(this.firestore, 'flats', favoriteData.flatId);
+        const flatRef = doc(this.firestore, "flats", favoriteData.flatId);
         const flatSnap = await getDoc(flatRef);
 
         if (flatSnap.exists()) {
           const flatData = flatSnap.data();
           return {
             id: flatSnap.id,
-            city: flatData['city'],
-            streetName: flatData['streetName'],
-            streetNumber: flatData['streetNumber'],
-            areaSize: flatData['areaSize'],
-            hasAC: flatData['hasAC'],
-            yearBuilt: flatData['yearBuilt'],
-            rentPrice: flatData['rentPrice'],
-            dateAvailable: flatData['dateAvailable'],
-            userId: flatData['userId'],
-            createdAt: flatData['createdAt'],
+            city: flatData["city"],
+            streetName: flatData["streetName"],
+            streetNumber: flatData["streetNumber"],
+            areaSize: flatData["areaSize"],
+            hasAC: flatData["hasAC"],
+            yearBuilt: flatData["yearBuilt"],
+            rentPrice: flatData["rentPrice"],
+            dateAvailable: flatData["dateAvailable"],
+            userId: flatData["userId"],
+            createdAt: flatData["createdAt"],
+            images: flatData["images"],
           } as Flat;
         }
         return null;
@@ -149,7 +151,7 @@ export class FavoritesService {
       const flats = await Promise.all(flatsPromises);
       return flats.filter((flat): flat is Flat => flat !== null);
     } catch (error) {
-      console.error('Error getting favorite flats:', error);
+      console.error("Error getting favorite flats:", error);
       return [];
     }
   }

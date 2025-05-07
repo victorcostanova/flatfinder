@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { HeaderComponent } from '../header/header.component';
-import { Firestore, collection, getDocs } from '@angular/fire/firestore';
-import { FavoritesService } from '../../services/favorites.service';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+import { HeaderComponent } from "../header/header.component";
+import { Firestore, collection, getDocs } from "@angular/fire/firestore";
+import { FavoritesService } from "../../services/favorites.service";
+import { MatTableModule } from "@angular/material/table";
+import { MatIconModule } from "@angular/material/icon";
+import { MatButtonModule } from "@angular/material/button";
+import { MatSortModule, MatSort, Sort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
 
 interface Flat {
   id: string;
@@ -22,10 +22,11 @@ interface Flat {
   dateAvailable: Date;
   userId: string;
   createdAt: Date;
+  images?: string[];
 }
 
 @Component({
-  selector: 'app-home',
+  selector: "app-home",
   standalone: true,
   imports: [
     CommonModule,
@@ -36,21 +37,21 @@ interface Flat {
     MatButtonModule,
     MatSortModule,
   ],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.css"],
 })
 export class HomeComponent implements OnInit {
   flats: Flat[] = [];
   dataSource: MatTableDataSource<Flat>;
   favoriteStatus: { [key: string]: boolean } = {};
   isProcessing: { [key: string]: boolean } = {};
-  error = '';
+  error = "";
   displayedColumns: string[] = [
-    'city',
-    'address',
-    'areaSize',
-    'price',
-    'actions',
+    "city",
+    "address",
+    "areaSize",
+    "price",
+    "actions",
   ];
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -73,7 +74,7 @@ export class HomeComponent implements OnInit {
 
   async loadFlats() {
     try {
-      const flatsRef = collection(this.firestore, 'flats');
+      const flatsRef = collection(this.firestore, "flats");
       const querySnapshot = await getDocs(flatsRef);
       this.flats = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -92,14 +93,14 @@ export class HomeComponent implements OnInit {
         this.favoriteStatus[flat.id] = statusList[index];
       });
     } catch (error) {
-      console.error('Error loading flats:', error);
-      this.error = 'Failed to load flats. Please try again later.';
+      console.error("Error loading flats:", error);
+      this.error = "Failed to load flats. Please try again later.";
     }
   }
 
   // Custom sort function to handle the sorting
   sortData(sort: Sort) {
-    if (!sort.active || sort.direction === '') {
+    if (!sort.active || sort.direction === "") {
       // If no sorting or direction specified, revert to original data
       this.dataSource.data = this.flats;
       return;
@@ -107,18 +108,18 @@ export class HomeComponent implements OnInit {
 
     // Create a new sorted array
     this.dataSource.data = this.flats.slice().sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
+      const isAsc = sort.direction === "asc";
 
       switch (sort.active) {
-        case 'city':
+        case "city":
           return this.compare(
             a.city.toLowerCase(),
             b.city.toLowerCase(),
             isAsc
           );
-        case 'areaSize':
+        case "areaSize":
           return this.compare(a.areaSize, b.areaSize, isAsc);
-        case 'price':
+        case "price":
           return this.compare(a.rentPrice, b.rentPrice, isAsc);
         default:
           return 0;
@@ -140,11 +141,14 @@ export class HomeComponent implements OnInit {
         this.favoritesService.removeFromFavorites(flat.id);
         this.favoriteStatus[flat.id] = false;
       } else {
-        this.favoritesService.addToFavorites(flat);
+        this.favoritesService.addToFavorites({
+          ...flat,
+          images: flat.images ?? [],
+        });
         this.favoriteStatus[flat.id] = true;
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      console.error("Error toggling favorite:", error);
     } finally {
       this.isProcessing[flat.id] = false;
     }

@@ -13,14 +13,50 @@
       class="flat-card"
       [routerLink]="['/flat', flat.id]"
     >
-      <div class="flat-header">
-        <h2>{{ flat.city }}</h2>
-        <p class="address">{{ flat.streetName }}, {{ flat.streetNumber }}</p>
-      </div>
-      <div class="flat-price">
-        <span class="price">${{ flat.rentPrice }}</span>
-        <span class="period">/month</span>
-      </div>
+      <!-- Card COM foto -->
+      <ng-container *ngIf="flat.images && flat.images.length > 0; else noImage">
+        <div class="flat-images">
+          <img
+            [src]="flat.images[0]"
+            alt="Flat image"
+            class="flat-main-image"
+          />
+        </div>
+        <div class="flat-header">
+          <div class="header-content">
+            <h2>{{ flat.city }}</h2>
+            <p class="address">
+              {{ flat.streetName }}, {{ flat.streetNumber }}
+            </p>
+            <div class="flat-price">
+              <span class="price">${{ flat.rentPrice }}</span>
+              <span class="period">/month</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <!-- Card SEM foto -->
+      <ng-template #noImage>
+        <div class="flat-images no-image">
+          <img
+            src="assets/images/noimage.jpg"
+            alt="No image"
+            class="flat-main-image"
+          />
+        </div>
+        <div class="flat-header no-image-header">
+          <div class="header-content">
+            <h2>{{ flat.city }}</h2>
+            <p class="address">
+              {{ flat.streetName }}, {{ flat.streetNumber }}
+            </p>
+            <div class="flat-price">
+              <span class="price">${{ flat.rentPrice }}</span>
+              <span class="period">/month</span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
       <div
         class="favorite-icon"
         (click)="$event.stopPropagation(); toggleFavorite(flat)"
