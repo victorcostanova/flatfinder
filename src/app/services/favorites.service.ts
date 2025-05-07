@@ -9,12 +9,8 @@ import {
   getDocs,
   doc,
   getDoc,
-  DocumentData,
-  collectionData,
-  DocumentReference,
 } from "@angular/fire/firestore";
 import { AuthService } from "./auth.service";
-import { Observable } from "rxjs";
 
 export interface Flat {
   id: string;
