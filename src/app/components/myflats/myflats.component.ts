@@ -27,6 +27,7 @@ interface Flat {
   dateAvailable: Date;
   userId: string;
   createdAt: Date;
+  images?: string[];
 }
 
 @Component({

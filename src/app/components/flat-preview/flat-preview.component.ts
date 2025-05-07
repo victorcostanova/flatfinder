@@ -39,6 +39,7 @@ interface Flat {
   dateAvailable: any;
   userId: string;
   createdAt: any;
+  images?: string[];
 }
 
 interface Message {
@@ -69,12 +70,15 @@ interface Message {
 })
 export class FlatPreviewComponent implements OnInit {
   flat: Flat | null = null;
+  loading = true;
+  error: string | null = null;
   isFavorite = false;
   isProcessing = false;
   message = "";
   isOwner = false;
   currentUserId: string | null = null;
   messages: Message[] = [];
+  currentImage: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -86,7 +90,7 @@ export class FlatPreviewComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
-  async ngOnInit() {
+  ngOnInit(): void {
     const flatId = this.route.snapshot.paramMap.get("id");
     if (!flatId) {
       this.router.navigate(["/home"]);
@@ -96,10 +100,16 @@ export class FlatPreviewComponent implements OnInit {
     const currentUser = this.auth.currentUser;
     this.currentUserId = currentUser?.uid || null;
 
+    this.route.paramMap.subscribe((params) => {
+      this.getFlatDetails();
+    });
+  }
+
+  async getFlatDetails() {
     try {
-      const flatDocRef = doc(this.firestore, "flats", flatId);
+      const flatDocRef = doc(this.firestore, "flats", this.route.snapshot.paramMap.get("id") || "");
       const flatSnapPromise = getDoc(flatDocRef);
-      const isFavPromise = this.favoritesService.isFavorite(flatId);
+      const isFavPromise = this.favoritesService.isFavorite(this.route.snapshot.paramMap.get("id") || "");
 
       const [flatSnap, isFavorite] = await Promise.all([
         flatSnapPromise,
@@ -124,10 +134,16 @@ export class FlatPreviewComponent implements OnInit {
         dateAvailable: data["dateAvailable"],
         userId: data["userId"],
         createdAt: data["createdAt"],
+        images: data["images"],
       };
 
       this.isFavorite = isFavorite;
       this.isOwner = this.currentUserId === this.flat.userId;
+
+      // Set first image as current image if available
+      if (this.flat.images && this.flat.images.length > 0) {
+        this.currentImage = this.flat.images[0];
+      }
     } catch (error) {
       console.error("Error loading flat:", error);
       this.router.navigate(["/home"]);
@@ -238,6 +254,10 @@ export class FlatPreviewComponent implements OnInit {
       return date.toDate().toLocaleDateString();
     }
     return new Date(date).toLocaleDateString();
+  }
+
+  setCurrentImage(imageUrl: string) {
+    this.currentImage = imageUrl;
   }
 }
 

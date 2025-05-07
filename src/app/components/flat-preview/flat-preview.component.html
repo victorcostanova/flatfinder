@@ -41,6 +41,21 @@
       </div>
     </div>
 
+    <div class="flat-images" *ngIf="flat && flat.images && flat.images.length > 0">
+      <div class="image-preview-main">
+        <img [src]="currentImage" alt="Flat Image">
+      </div>
+      <div class="image-thumbnails" *ngIf="flat && flat.images.length > 1">
+        <div 
+          *ngFor="let img of flat.images; let i = index" 
+          class="thumbnail"
+          [class.active]="img === currentImage"
+          (click)="setCurrentImage(img)">
+          <img [src]="img" alt="Thumbnail">
+        </div>
+      </div>
+    </div>
+
     <div class="actions">
       <button
         class="favorite-btn"

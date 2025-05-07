@@ -140,6 +140,32 @@
         </div>
       </div>
 
+      <!-- Add image upload section -->
+      <div class="image-upload-section">
+        <label for="images">Upload Images</label>
+        <div class="image-upload-container">
+          <div class="upload-btn-wrapper">
+            <button type="button" class="upload-btn">Choose Images</button>
+            <input 
+              type="file" 
+              id="images" 
+              multiple 
+              accept="image/*" 
+              (change)="onFileSelected($event)" 
+            />
+          </div>
+          <span class="upload-instruction">Select multiple images of your flat</span>
+        </div>
+        
+        <!-- Image preview -->
+        <div class="image-preview-container" *ngIf="previewUrls.length > 0">
+          <div class="image-preview" *ngFor="let url of previewUrls; let i = index">
+            <img [src]="url" alt="Preview" />
+            <button type="button" class="remove-image-btn" (click)="removeImage(i)">×</button>
+          </div>
+        </div>
+      </div>
+
       <div class="form-row">
         <div class="form-group">
           <label for="dateAvailable">Date Available</label>
@@ -171,8 +197,9 @@
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" [disabled]="!flatForm.valid">
-        Save Flat
+      <button type="submit" class="submit-btn" [disabled]="!flatForm.valid || isUploading">
+        <span *ngIf="!isUploading">Save Flat</span>
+        <span *ngIf="isUploading">Uploading...</span>
       </button>
     </form>
   </div>
