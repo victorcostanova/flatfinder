@@ -136,22 +136,61 @@
       </div>
     </div>
 
+    <!-- Add image upload section -->
+    <div class="image-upload-section">
+      <label for="images">Upload Images</label>
+      <div class="image-upload-container">
+        <div class="upload-btn-wrapper">
+          <button type="button" class="upload-btn">Choose Images</button>
+          <input
+            type="file"
+            id="images"
+            multiple
+            accept="image/*"
+            (change)="onFileSelected($event)"
+          />
+        </div>
+        <span class="upload-instruction"
+          >Select multiple images of your flat</span
+        >
+      </div>
+
+      <!-- Image preview -->
+      <div class="image-preview-container" *ngIf="previewUrls.length > 0">
+        <div
+          class="image-preview"
+          *ngFor="let url of previewUrls; let i = index"
+        >
+          <img [src]="url" alt="Preview" />
+          <button
+            type="button"
+            class="remove-image-btn"
+            (click)="removeImage(i)"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group checkbox-group">
-      <input
-        type="checkbox"
-        id="hasAC"
-        formControlName="hasAC"
-        class="checkbox"
-      />
-      <label for="hasAC">Has Air Conditioning</label>
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="hasAC" />
+        Has Air Conditioning
+      </label>
     </div>
 
     <div class="form-actions">
       <button type="button" class="cancel-btn" routerLink="/myflats">
         Cancel
       </button>
-      <button type="submit" class="save-btn" [disabled]="flatForm.invalid">
-        Save Changes
+      <button
+        type="submit"
+        class="save-btn"
+        [disabled]="!flatForm.valid || isUploading"
+      >
+        <span *ngIf="!isUploading">Save Changes</span>
+        <span *ngIf="isUploading">Uploading...</span>
       </button>
     </div>
   </form>
