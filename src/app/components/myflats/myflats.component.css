@@ -148,6 +148,16 @@ h1 {
   background-color: #c0392b;
 }
 
+.message-btn {
+  background-color: #9c27b0;
+  color: white;
+  flex: 1;
+}
+
+.message-btn:hover {
+  background-color: #7b1fa2;
+}
+
 .no-flats {
   text-align: center;
   padding: 2rem;
