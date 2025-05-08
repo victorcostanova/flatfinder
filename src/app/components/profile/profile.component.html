@@ -95,6 +95,14 @@
             <mat-icon>check</mat-icon>
           </button>
           <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="profileForm.get('birthDate')?.errors?.['required']">
+            Birth date is required
+          </mat-error>
+          <mat-error
+            *ngIf="profileForm.get('birthDate')?.errors?.['minimumAge']"
+          >
+            You must be at least 18 years old
+          </mat-error>
         </mat-form-field>
       </div>
 

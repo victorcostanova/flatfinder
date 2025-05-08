@@ -1,23 +1,24 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
-} from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
-import { MatSnackBar } from '@angular/material/snack-bar';
+} from "@angular/forms";
+import { AuthService } from "../../services/auth.service";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatButtonModule } from "@angular/material/button";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatNativeDateModule } from "@angular/material/core";
+import { Firestore, doc, setDoc } from "@angular/fire/firestore";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { minimumAgeValidator } from "../../validators/age.validator";
 
 @Component({
-  selector: 'app-register',
+  selector: "app-register",
   standalone: true,
   imports: [
     CommonModule,
@@ -29,12 +30,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatDatepickerModule,
     MatNativeDateModule,
   ],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
+  templateUrl: "./register.component.html",
+  styleUrls: ["./register.component.css"],
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  error: string = '';
+  error: string = "";
 
   constructor(
     private authService: AuthService,
@@ -44,19 +45,19 @@ export class RegisterComponent {
   ) {
     this.registerForm = this.fb.group(
       {
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required],
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        birthDate: ['', Validators.required],
+        email: ["", [Validators.required, Validators.email]],
+        password: ["", [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ["", Validators.required],
+        firstName: ["", Validators.required],
+        lastName: ["", Validators.required],
+        birthDate: ["", [Validators.required, minimumAgeValidator(18)]],
       },
       { validator: this.passwordMatchValidator }
     );
   }
 
   passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
+    return g.get("password")?.value === g.get("confirmPassword")?.value
       ? null
       : { mismatch: true };
   }
@@ -81,22 +82,22 @@ export class RegisterComponent {
           userData
         );
 
-        this.snackBar.open('Registration successful!', 'Close', {
+        this.snackBar.open("Registration successful!", "Close", {
           duration: 3000,
         });
       } catch (error: any) {
-        console.error('Registration error:', error);
+        console.error("Registration error:", error);
         this.snackBar.open(
-          error.message || 'Registration failed. Please try again.',
-          'Close',
+          error.message || "Registration failed. Please try again.",
+          "Close",
           { duration: 3000 }
         );
       }
     } else {
-      if (this.registerForm.errors?.['mismatch']) {
-        this.error = 'Passwords do not match';
+      if (this.registerForm.errors?.["mismatch"]) {
+        this.error = "Passwords do not match";
       } else {
-        this.error = 'Please fill in all fields correctly';
+        this.error = "Please fill in all fields correctly";
       }
     }
   }

@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "flatfinder-cd124"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

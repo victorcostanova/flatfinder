@@ -46,6 +46,11 @@
         <mat-error *ngIf="registerForm.get('birthDate')?.errors?.['required']">
           Birth date is required
         </mat-error>
+        <mat-error
+          *ngIf="registerForm.get('birthDate')?.errors?.['minimumAge']"
+        >
+          You must be at least 18 years old to register
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

@@ -31,6 +31,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../user-details/user-details.component";
+import { minimumAgeValidator } from "../../validators/age.validator";
 
 @Component({
   selector: "app-profile",
@@ -74,7 +75,7 @@ export class ProfileComponent implements OnInit {
     this.profileForm = this.fb.group({
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
-      birthDate: ["", Validators.required],
+      birthDate: ["", [Validators.required, minimumAgeValidator(18)]],
       email: [{ value: "", disabled: true }],
     });
 
