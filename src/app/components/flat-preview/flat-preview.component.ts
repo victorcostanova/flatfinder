@@ -208,6 +208,7 @@ export class FlatPreviewComponent implements OnInit {
       const dialogData = {
         flatAddress: `${this.flat.streetName}, ${this.flat.streetNumber}, ${this.flat.city}`,
         messages: this.messages,
+        currentUserId: this.currentUserId,
       };
 
       if (this.messages.length === 0) {
@@ -268,7 +269,12 @@ export class FlatPreviewComponent implements OnInit {
     <mat-dialog-content>
       <p class="flat-address">{{ data.flatAddress }}</p>
       <div class="messages-container">
-        <div *ngFor="let message of data.messages" class="message-item">
+        <div *ngFor="let message of data.messages" 
+             class="message-item"
+             [ngClass]="{'sent': message.senderId === data.currentUserId, 'received': message.senderId !== data.currentUserId}">
+          <div class="message-header">
+            <span class="sender-label">{{ message.senderId === data.currentUserId ? 'You' : 'Owner' }}</span>
+          </div>
           <div class="message-content">{{ message.message }}</div>
           <div class="message-date">
             {{ message.createdAt | date : "medium" }}
@@ -293,6 +299,23 @@ export class FlatPreviewComponent implements OnInit {
       .message-item {
         padding: 1rem;
         border-bottom: 1px solid #eee;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+      }
+      .sent {
+        background-color: #e3f2fd;
+        margin-left: 20px;
+      }
+      .received {
+        background-color: #f5f5f5;
+        margin-right: 20px;
+      }
+      .message-header {
+        margin-bottom: 0.5rem;
+      }
+      .sender-label {
+        font-weight: bold;
+        font-size: 0.9rem;
       }
       .message-content {
         margin-bottom: 0.5rem;
@@ -312,6 +335,7 @@ export class MessageHistoryDialog {
     public data: {
       messages: Message[];
       flatAddress: string;
+      currentUserId: string;
     }
   ) {}
 }
