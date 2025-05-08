@@ -16,8 +16,7 @@ import {
   updateDoc,
   Timestamp,
 } from "@angular/fire/firestore";
-import { Auth, user } from "@angular/fire/auth";
-import { Observable } from "rxjs";
+import { Auth } from "@angular/fire/auth";
 import { UploadService } from "../../services/upload.service";
 
 interface Flat {
