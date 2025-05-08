@@ -4,7 +4,6 @@ import { RouterModule } from "@angular/router";
 import { HeaderComponent } from "../header/header.component";
 import {
   Firestore,
-  Timestamp,
   collection,
   getDocs,
   query,
@@ -12,11 +11,16 @@ import {
   deleteDoc,
   doc,
   orderBy,
+  getDoc,
 } from "@angular/fire/firestore";
 import { Auth, user } from "@angular/fire/auth";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { MatDialog, MatDialogModule, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialog,
+  MatDialogModule,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
 
 interface Flat {
@@ -47,7 +51,13 @@ interface Message {
 @Component({
   selector: "app-myflats",
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, MatDialogModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderComponent,
+    MatDialogModule,
+    MatButtonModule,
+  ],
   templateUrl: "./myflats.component.html",
   styleUrls: ["./myflats.component.css"],
 })
@@ -59,7 +69,7 @@ export class MyflatsComponent implements OnInit {
   currentUserId: string | null = null;
 
   constructor(
-    private firestore: Firestore, 
+    private firestore: Firestore,
     private auth: Auth,
     private dialog: MatDialog
   ) {
@@ -106,7 +116,7 @@ export class MyflatsComponent implements OnInit {
 
     try {
       // Find the flat details
-      const flat = this.flats.find(f => f.id === flatId);
+      const flat = this.flats.find((f) => f.id === flatId);
       if (!flat) {
         console.error("Flat not found");
         return;
@@ -133,27 +143,40 @@ export class MyflatsComponent implements OnInit {
         } as Message;
       });
 
-      // Group messages by sender for better organization when viewing as owner
-      const messagesByUser = new Map<string, {
-        userId: string,
-        userName: string,
-        messages: Message[]
-      }>();
-
-      // First, collect all unique users
-      const uniqueUserIds = new Set<string>();
-      messages.forEach(msg => {
-        if (msg.senderId !== this.currentUserId) {
-          uniqueUserIds.add(msg.senderId);
+      const uniqueSenderIds = Array.from(
+        new Set(
+          messages
+            .filter((msg) => msg.senderId !== this.currentUserId)
+            .map((msg) => msg.senderId)
+        )
+      );
+      const senderNames: { [userId: string]: string } = {};
+      for (const userId of uniqueSenderIds) {
+        try {
+          const userDoc = await getDoc(doc(this.firestore, "users", userId));
+          console.log(
+            "Buscando usuário",
+            userId,
+            userDoc.exists() ? userDoc.data() : "NÃO ENCONTRADO"
+          );
+          if (userDoc.exists()) {
+            senderNames[userId] = userDoc.data()["firstName"] || "User";
+          } else {
+            senderNames[userId] = "User";
+          }
+        } catch (e) {
+          console.error("Erro ao buscar usuário", userId, e);
+          senderNames[userId] = "User";
         }
-      });
+      }
 
       // Prepare dialog data
       const dialogData = {
         flatAddress: `${flat.streetName}, ${flat.streetNumber}, ${flat.city}`,
         messages: messages,
         currentUserId: this.currentUserId,
-        isOwnerView: true
+        isOwnerView: true,
+        senderNames: senderNames,
       };
 
       // Open appropriate dialog
@@ -187,17 +210,29 @@ export class MyflatsComponent implements OnInit {
     <h2 mat-dialog-title>Message History</h2>
     <mat-dialog-content>
       <p class="flat-address">{{ data.flatAddress }}</p>
-      
+
       <!-- Owner view with grouped messages by user -->
       <div *ngIf="data.isOwnerView" class="messages-container owner-view">
-        <div *ngFor="let message of data.messages" 
-             class="message-item"
-             [ngClass]="{'sent': message.senderId === data.currentUserId, 'received': message.senderId !== data.currentUserId}">
+        <div
+          *ngFor="let message of data.messages"
+          class="message-item"
+          [ngClass]="{
+            sent: message.senderId === data.currentUserId,
+            received: message.senderId !== data.currentUserId
+          }"
+        >
           <div class="message-header">
-            <span class="sender-label" *ngIf="message.senderId !== data.currentUserId">
-              Inquirer (User ID: {{getShortenedId(message.senderId)}})
+            <span
+              class="sender-label"
+              *ngIf="message.senderId !== data.currentUserId"
+            >
+              {{ data.senderNames[message.senderId] || "User" }}
             </span>
-            <span class="sender-label" *ngIf="message.senderId === data.currentUserId">You</span>
+            <span
+              class="sender-label"
+              *ngIf="message.senderId === data.currentUserId"
+              >You</span
+            >
           </div>
           <div class="message-content">{{ message.message }}</div>
           <div class="message-date">
@@ -205,14 +240,21 @@ export class MyflatsComponent implements OnInit {
           </div>
         </div>
       </div>
-      
+
       <!-- Regular user view -->
       <div *ngIf="!data.isOwnerView" class="messages-container">
-        <div *ngFor="let message of data.messages" 
-             class="message-item"
-             [ngClass]="{'sent': message.senderId === data.currentUserId, 'received': message.senderId !== data.currentUserId}">
+        <div
+          *ngFor="let message of data.messages"
+          class="message-item"
+          [ngClass]="{
+            sent: message.senderId === data.currentUserId,
+            received: message.senderId !== data.currentUserId
+          }"
+        >
           <div class="message-header">
-            <span class="sender-label">{{ message.senderId === data.currentUserId ? 'You' : 'Owner' }}</span>
+            <span class="sender-label">{{
+              message.senderId === data.currentUserId ? "You" : "Owner"
+            }}</span>
           </div>
           <div class="message-content">{{ message.message }}</div>
           <div class="message-date">
@@ -264,7 +306,7 @@ export class MyflatsComponent implements OnInit {
         color: #666;
       }
       .owner-view .received {
-        background-color: #f8f1ff; 
+        background-color: #f8f1ff;
       }
     `,
   ],
@@ -279,12 +321,13 @@ export class MessageHistoryDialog {
       flatAddress: string;
       currentUserId: string;
       isOwnerView: boolean;
+      senderNames: { [userId: string]: string };
     }
   ) {}
-  
+
   getShortenedId(id: string): string {
-    if (!id) return '';
-    return id.substring(0, 6) + '...';
+    if (!id) return "";
+    return id.substring(0, 6) + "...";
   }
 }
 

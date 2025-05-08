@@ -78,7 +78,7 @@ export class FlatPreviewComponent implements OnInit {
   isOwner = false;
   currentUserId: string | null = null;
   messages: Message[] = [];
-  currentImage: string = '';
+  currentImage: string = "";
 
   constructor(
     private route: ActivatedRoute,
@@ -107,9 +107,15 @@ export class FlatPreviewComponent implements OnInit {
 
   async getFlatDetails() {
     try {
-      const flatDocRef = doc(this.firestore, "flats", this.route.snapshot.paramMap.get("id") || "");
+      const flatDocRef = doc(
+        this.firestore,
+        "flats",
+        this.route.snapshot.paramMap.get("id") || ""
+      );
       const flatSnapPromise = getDoc(flatDocRef);
-      const isFavPromise = this.favoritesService.isFavorite(this.route.snapshot.paramMap.get("id") || "");
+      const isFavPromise = this.favoritesService.isFavorite(
+        this.route.snapshot.paramMap.get("id") || ""
+      );
 
       const [flatSnap, isFavorite] = await Promise.all([
         flatSnapPromise,
@@ -184,30 +190,15 @@ export class FlatPreviewComponent implements OnInit {
     }
 
     try {
-      let messagesQuery;
-      
-      // Owner sees all messages for this flat
-      if (this.isOwner) {
-        messagesQuery = query(
-          collection(this.firestore, "messages"),
-          where("flatId", "==", this.flat.id),
-          orderBy("createdAt", "desc")
-        );
-      } 
-      // Non-owner only sees their own conversation with the owner
-      else {
-        messagesQuery = query(
-          collection(this.firestore, "messages"),
-          where("flatId", "==", this.flat.id),
-          where("senderId", "in", [this.currentUserId, this.flat.userId]),
-          where("receiverId", "in", [this.currentUserId, this.flat.userId]),
-          orderBy("createdAt", "desc")
-        );
-      }
+      const messagesQuery = query(
+        collection(this.firestore, "messages"),
+        where("flatId", "==", this.flat.id),
+        where("senderId", "==", this.currentUserId),
+        orderBy("createdAt", "desc")
+      );
 
       const messagesSnapshot = await getDocs(messagesQuery);
-
-      this.messages = messagesSnapshot.docs.map((doc) => {
+      const messages = messagesSnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -220,22 +211,13 @@ export class FlatPreviewComponent implements OnInit {
         } as Message;
       });
 
-      // If not owner, filter to only show conversation between current user and owner
-      if (!this.isOwner) {
-        this.messages = this.messages.filter(msg => 
-          (msg.senderId === this.currentUserId && msg.receiverId === this.flat?.userId) || 
-          (msg.senderId === this.flat?.userId && msg.receiverId === this.currentUserId)
-        );
-      }
-
       const dialogData = {
         flatAddress: `${this.flat.streetName}, ${this.flat.streetNumber}, ${this.flat.city}`,
-        messages: this.messages,
+        messages: messages,
         currentUserId: this.currentUserId,
-        isOwnerView: this.isOwner,
       };
 
-      if (this.messages.length === 0) {
+      if (messages.length === 0) {
         this.dialog.open(NoMessagesDialog, {
           width: "400px",
           data: { flatAddress: dialogData.flatAddress },
@@ -285,39 +267,16 @@ export class FlatPreviewComponent implements OnInit {
     this.currentImage = imageUrl;
   }
 }
-
 @Component({
   selector: "message-history-dialog",
   template: `
     <h2 mat-dialog-title>Message History</h2>
     <mat-dialog-content>
       <p class="flat-address">{{ data.flatAddress }}</p>
-      
-      <!-- Owner view with grouped messages by user -->
-      <div *ngIf="isOwnerView()" class="messages-container owner-view">
-        <div *ngFor="let message of data.messages" 
-             class="message-item"
-             [ngClass]="{'sent': message.senderId === data.currentUserId, 'received': message.senderId !== data.currentUserId}">
+      <div class="messages-container">
+        <div *ngFor="let message of data.messages" class="message-item sent">
           <div class="message-header">
-            <span class="sender-label" *ngIf="message.senderId !== data.currentUserId">
-              Inquirer (User ID: {{getShortenedId(message.senderId)}})
-            </span>
-            <span class="sender-label" *ngIf="message.senderId === data.currentUserId">You</span>
-          </div>
-          <div class="message-content">{{ message.message }}</div>
-          <div class="message-date">
-            {{ message.createdAt | date : "medium" }}
-          </div>
-        </div>
-      </div>
-      
-      <!-- Regular user view -->
-      <div *ngIf="!isOwnerView()" class="messages-container">
-        <div *ngFor="let message of data.messages" 
-             class="message-item"
-             [ngClass]="{'sent': message.senderId === data.currentUserId, 'received': message.senderId !== data.currentUserId}">
-          <div class="message-header">
-            <span class="sender-label">{{ message.senderId === data.currentUserId ? 'You' : 'Owner' }}</span>
+            <span class="sender-label">You</span>
           </div>
           <div class="message-content">{{ message.message }}</div>
           <div class="message-date">
@@ -345,14 +304,8 @@ export class FlatPreviewComponent implements OnInit {
         border-bottom: 1px solid #eee;
         margin-bottom: 0.5rem;
         border-radius: 8px;
-      }
-      .sent {
         background-color: #e3f2fd;
         margin-left: 20px;
-      }
-      .received {
-        background-color: #f5f5f5;
-        margin-right: 20px;
       }
       .message-header {
         margin-bottom: 0.5rem;
@@ -368,9 +321,6 @@ export class FlatPreviewComponent implements OnInit {
         font-size: 0.8rem;
         color: #666;
       }
-      .owner-view .received {
-        background-color: #f8f1ff; 
-      }
     `,
   ],
   standalone: true,
@@ -383,18 +333,8 @@ export class MessageHistoryDialog {
       messages: Message[];
       flatAddress: string;
       currentUserId: string;
-      isOwnerView?: boolean;
     }
   ) {}
-  
-  isOwnerView(): boolean {
-    return this.data.isOwnerView === true;
-  }
-  
-  getShortenedId(id: string): string {
-    if (!id) return '';
-    return id.substring(0, 6) + '...';
-  }
 }
 
 @Component({

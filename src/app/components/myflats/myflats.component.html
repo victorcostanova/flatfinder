@@ -16,7 +16,14 @@
   <div *ngIf="!loading && !error" class="flats-grid">
     <div *ngFor="let flat of flats" class="flat-card">
       <div class="flat-images" *ngIf="flat.images && flat.images.length > 0">
-        <img [src]="flat.images[0]" alt="Flat image" class="flat-main-image">
+        <img [src]="flat.images[0]" alt="Flat image" class="flat-main-image" />
+      </div>
+      <div class="flat-images" *ngIf="!flat.images || flat.images.length === 0">
+        <img
+          src="assets/images/noimage.jpg"
+          alt="No image"
+          class="flat-main-image"
+        />
       </div>
       <div class="flat-header">
         <h2>{{ flat.city }}</h2>

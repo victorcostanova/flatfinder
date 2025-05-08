@@ -1,8 +1,9 @@
 .container {
-  margin: 2rem auto;
+  margin-top: 2rem;
   padding: 0 1rem;
+  padding-top: 5rem;
   background-color: #e3e2dc;
-  height: 100%;
+  box-sizing: border-box;
 }
 
 h1 {
