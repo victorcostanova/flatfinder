@@ -71,6 +71,13 @@
       <button routerLink="/home" class="back-button">Back to Home</button>
     </div>
 
+    <!-- Owner Message History Button -->
+    <div *ngIf="isOwner" class="owner-message-section">
+      <button mat-raised-button color="accent" (click)="showMessageHistory()" class="message-history-btn">
+        View Message History
+      </button>
+    </div>
+
     <!-- Message Section -->
     <div *ngIf="!isOwner" class="message-section">
       <mat-form-field appearance="outline" class="message-input">
