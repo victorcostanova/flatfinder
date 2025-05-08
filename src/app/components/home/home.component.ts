@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { HeaderComponent } from "../header/header.component";
@@ -9,6 +9,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSortModule, MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
+import { BehaviorSubject, Subject, takeUntil } from "rxjs";
 
 interface Flat {
   id: string;
@@ -19,9 +20,9 @@ interface Flat {
   hasAC: boolean;
   yearBuilt: number;
   rentPrice: number;
-  dateAvailable: Date;
+  dateAvailable: any;
   userId: string;
-  createdAt: Date;
+  createdAt: any;
   images?: string[];
 }
 
@@ -40,7 +41,11 @@ interface Flat {
   templateUrl: "./home.component.html",
   styleUrls: ["./home.component.css"],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private flatsSubject = new BehaviorSubject<Flat[]>([]);
+  flats$ = this.flatsSubject.asObservable();
+  
   flats: Flat[] = [];
   dataSource: MatTableDataSource<Flat>;
   favoriteStatus: { [key: string]: boolean } = {};
@@ -65,31 +70,44 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit() {
     this.loadFlats();
+    this.setupSubscriptions();
+  }
+
+  private setupSubscriptions() {
+    this.flats$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(flats => {
+      this.flats = flats;
+      this.dataSource.data = flats;
+    });
   }
 
   ngAfterViewInit() {
-    // Connect the sort directive to the data source after view init
     this.dataSource.sort = this.sort;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async loadFlats() {
     try {
       const flatsRef = collection(this.firestore, "flats");
       const querySnapshot = await getDocs(flatsRef);
-      this.flats = querySnapshot.docs.map((doc) => ({
+      const loadedFlats = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Flat[];
 
-      // Update the data source with the loaded flats
-      this.dataSource.data = this.flats;
+      this.flatsSubject.next(loadedFlats);
 
       // Check favorite status for each flat
       const statusList = await Promise.all(
-        this.flats.map((flat) => this.favoritesService.isFavorite(flat.id))
+        loadedFlats.map((flat) => this.favoritesService.isFavorite(flat.id))
       );
 
-      this.flats.forEach((flat, index) => {
+      loadedFlats.forEach((flat, index) => {
         this.favoriteStatus[flat.id] = statusList[index];
       });
     } catch (error) {
@@ -98,37 +116,39 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // Custom sort function to handle the sorting
+  private memoizedCompare = new Map<string, (a: any, b: any) => number>();
+
   sortData(sort: Sort) {
     if (!sort.active || sort.direction === "") {
-      // If no sorting or direction specified, revert to original data
       this.dataSource.data = this.flats;
       return;
     }
 
-    // Create a new sorted array
-    this.dataSource.data = this.flats.slice().sort((a, b) => {
-      const isAsc = sort.direction === "asc";
+    const sortKey = `${sort.active}-${sort.direction}`;
+    if (!this.memoizedCompare.has(sortKey)) {
+      this.memoizedCompare.set(sortKey, (a: Flat, b: Flat) => {
+        const isAsc = sort.direction === "asc";
+        switch (sort.active) {
+          case "city":
+            return this.compare(
+              a.city.toLowerCase(),
+              b.city.toLowerCase(),
+              isAsc
+            );
+          case "areaSize":
+            return this.compare(a.areaSize, b.areaSize, isAsc);
+          case "price":
+            return this.compare(a.rentPrice, b.rentPrice, isAsc);
+          default:
+            return 0;
+        }
+      });
+    }
 
-      switch (sort.active) {
-        case "city":
-          return this.compare(
-            a.city.toLowerCase(),
-            b.city.toLowerCase(),
-            isAsc
-          );
-        case "areaSize":
-          return this.compare(a.areaSize, b.areaSize, isAsc);
-        case "price":
-          return this.compare(a.rentPrice, b.rentPrice, isAsc);
-        default:
-          return 0;
-      }
-    });
+    this.dataSource.data = this.flats.slice().sort(this.memoizedCompare.get(sortKey)!);
   }
 
-  // Helper function for comparison
-  compare(a: number | string, b: number | string, isAsc: boolean) {
+  private compare(a: number | string, b: number | string, isAsc: boolean): number {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
@@ -137,16 +157,16 @@ export class HomeComponent implements OnInit {
 
     this.isProcessing[flat.id] = true;
     try {
-      if (this.favoriteStatus[flat.id]) {
-        this.favoritesService.removeFromFavorites(flat.id);
-        this.favoriteStatus[flat.id] = false;
-      } else {
-        this.favoritesService.addToFavorites({
+      const newStatus = !this.favoriteStatus[flat.id];
+      if (newStatus) {
+        await this.favoritesService.addToFavorites({
           ...flat,
           images: flat.images ?? [],
         });
-        this.favoriteStatus[flat.id] = true;
+      } else {
+        await this.favoritesService.removeFromFavorites(flat.id);
       }
+      this.favoriteStatus[flat.id] = newStatus;
     } catch (error) {
       console.error("Error toggling favorite:", error);
     } finally {
@@ -154,10 +174,10 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  formatDate(date: any): string {
-    if (date?.toDate) {
+  formatDate(date: Date | { toDate(): Date }): string {
+    if (date && typeof date === 'object' && 'toDate' in date) {
       return date.toDate().toLocaleDateString();
     }
-    return new Date(date).toLocaleDateString();
+    return new Date(date as Date).toLocaleDateString();
   }
 }
