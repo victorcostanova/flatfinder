@@ -1,6 +1,8 @@
 # Rent Ease 🏠
 
 RentEase is a web application built with **Angular**, integrated with **Firebase Authentication** and **Cloud Firestore**. It allows users to create, save, and browse available flats (apartments), as well as favorite listings.
+
+Access the link: https://flatfinder-cd124.web.app/
 ***
 
 Developed by: Victor Costa Nova, Jacobo Jose Ramirez Araujo, Maria Valeria Castro Trujillo, and Jose Antonio Cerda Ocejo
